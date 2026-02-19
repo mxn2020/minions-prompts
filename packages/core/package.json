@@ -33,7 +33,7 @@
     "versioning",
     "llm"
   ],
-  "license": "AGPL-3.0",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/mxn2020/minions-prompts"
