@@ -2,91 +2,64 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
-  typescript:
-    name: TypeScript (lint, test, build)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies (core)
-        working-directory: packages/core
-        run: npm install
-
-      - name: Lint (core)
-        working-directory: packages/core
-        run: npm run lint
-
-      - name: Test (core)
-        working-directory: packages/core
-        run: npm test
-
-      - name: Build (core)
-        working-directory: packages/core
-        run: npm run build
-
-      - name: Install dependencies (CLI)
-        working-directory: packages/cli
-        run: npm install
-
-      - name: Lint (CLI)
-        working-directory: packages/cli
-        run: npm run lint
-
-      - name: Build (CLI)
-        working-directory: packages/cli
-        run: npm run build
-
-  python:
-    name: Python (lint, test)
+  build-and-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.10', '3.11', '3.12']
+        node-version: [20, 22]
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Python ${{ matrix.python-version }}
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Build core packages
+        run: pnpm --filter minions-prompts run build && pnpm --filter minions-prompts-cli run build && pnpm --filter minions-prompts-docs run build
+
+      - name: Test
+        run: pnpm run test
+
+  python-sdk:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12', '3.13']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
+      - name: Install Python SDK
         working-directory: packages/python
-        run: |
-          pip install --upgrade pip
-          pip install -e ".[dev]"
-          pip install pytest
+        run: pip install -e ".[test]"
 
-      - name: Run tests
+      - name: Run Python tests
         working-directory: packages/python
-        run: pytest tests/ -v
-
-  docs:
-    name: Docs (build)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        working-directory: apps/docs
-        run: npm install
-
-      - name: Build docs
-        working-directory: apps/docs
-        run: npm run build
+        run: pytest -v

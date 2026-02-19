@@ -1,4 +1,4 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect } from 'vitest';
 import { PromptRenderer, RendererError } from '../src/PromptRenderer.js';
 
 describe('PromptRenderer', () => {

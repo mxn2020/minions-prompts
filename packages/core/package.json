@@ -13,17 +13,16 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "node --experimental-vm-modules ../../node_modules/.bin/jest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
     "minions-sdk": "^0.2.0"
   },
   "devDependencies": {
-    "@jest/globals": "^29.7.0",
     "@types/node": "^20.0.0",
-    "jest": "^29.7.0",
-    "ts-jest": "^29.4.6",
+    "vitest": "^1.6.1",
     "typescript": "^5.3.3"
   },
   "keywords": [

@@ -1,66 +1,81 @@
-name: Publish
+name: Publish Packages
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - 'v*'
 
+permissions:
+  contents: read
+
 jobs:
   publish-npm:
-    name: Publish to npm
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: 20
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
 
-      - name: Build and publish core
-        working-directory: packages/core
-        run: |
-          npm install
-          npm run build
-          npm publish --provenance --access public
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Test
+        run: pnpm run test
+
+      - name: Publish minions-prompts
+        run: pnpm --filter minions-prompts publish --no-git-checks --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Build and publish CLI
-        working-directory: packages/cli
-        run: |
-          npm install
-          npm run build
-          npm publish --provenance --access public
+      - name: Publish minions-prompts-cli
+        run: pnpm --filter minions-prompts-cli publish --no-git-checks --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  publish-pypi:
-    name: Publish to PyPI
+  publish-python:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
       - name: Install build tools
-        run: pip install build hatchling
+        run: pip install hatch
+
+      - name: Run tests
+        working-directory: packages/python
+        run: |
+          pip install -e ".[test]"
+          pytest -v
 
       - name: Build package
         working-directory: packages/python
-        run: python -m build
+        run: hatch build
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: packages/python/dist/
+          password: ${{ secrets.PYPI_TOKEN }}
