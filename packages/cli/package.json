@@ -1,0 +1,28 @@
+{
+  "name": "minions-prompts-cli",
+  "version": "0.1.0",
+  "description": "CLI for minions-prompts — version-controlled prompt engineering",
+  "type": "module",
+  "bin": {
+    "prompts": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "lint": "tsc --noEmit",
+    "dev": "node --loader ts-node/esm src/index.ts"
+  },
+  "dependencies": {
+    "minions-sdk": "^0.2.0",
+    "commander": "^11.1.0",
+    "inquirer": "^9.2.12",
+    "chalk": "^5.3.0",
+    "minions-prompts": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.0.0",
+    "@types/inquirer": "^9.0.7"
+  },
+  "license": "AGPL-3.0"
+}

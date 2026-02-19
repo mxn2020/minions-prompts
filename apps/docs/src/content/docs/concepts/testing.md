@@ -1,0 +1,107 @@
+---
+title: Test-Driven Prompt Development
+description: Write tests before you change prompts, just like TDD for code.
+---
+
+## The Problem
+
+Most prompt changes are evaluated manually: someone runs the prompt, reads the output, and decides if it looks good. This is:
+
+- **Unreproducible** — different testers, different judgments
+- **Slow** — manual review bottlenecks iteration
+- **Lossy** — no record of what was tested and why it passed
+
+## The Solution: Prompt Test Cases
+
+A `prompt-test` minion defines:
+- **Input variables** — the values to inject into the prompt
+- **Expected criteria** — natural language description of what good output looks like
+- **Scoring dimensions** — the axes along which to evaluate (e.g., relevance, clarity, accuracy)
+
+## Creating a Test
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+<Tabs>
+<TabItem label="TypeScript">
+```typescript
+import { createMinion } from 'minions-sdk';
+import { promptTestType } from 'minions-prompts';
+
+const { minion: test } = createMinion(
+  {
+    title: 'Tech audience test',
+    fields: {
+      inputVariables: {
+        topic: 'transformer architecture',
+        audience: 'software engineers',
+      },
+      expectedCriteria: 'Should explain attention mechanism clearly without oversimplifying.',
+      scoringDimensions: ['relevance', 'clarity', 'accuracy'],
+    },
+  },
+  promptTestType,
+);
+await storage.saveMinion(test);
+```
+</TabItem>
+<TabItem label="Python">
+```python
+from minions import create_minion
+from minions_prompts import prompt_test_type
+
+test, _ = create_minion(
+    {
+        "title": "Tech audience test",
+        "fields": {
+            "inputVariables": {
+                "topic": "transformer architecture",
+                "audience": "software engineers",
+            },
+            "expectedCriteria": "Should explain attention mechanism clearly without oversimplifying.",
+            "scoringDimensions": ["relevance", "clarity", "accuracy"],
+        },
+    },
+    prompt_test_type,
+)
+storage.save_minion(test)
+```
+</TabItem>
+</Tabs>
+
+## Running a Test
+
+<Tabs>
+<TabItem label="TypeScript">
+```typescript
+import { PromptScorer } from 'minions-prompts';
+
+const scorer = new PromptScorer(storage);
+
+const result = await scorer.runTest(promptId, test.id, {
+  scores: { relevance: 88, clarity: 82, accuracy: 90 },
+  passed: true,
+});
+
+console.log('Passed:', result.passed);
+console.log('Scores:', result.scores);
+```
+</TabItem>
+<TabItem label="Python">
+```python
+from minions_prompts import PromptScorer
+
+scorer = PromptScorer(storage)
+
+result = scorer.run_test(
+    prompt_id,
+    test.id,
+    scores={"relevance": 88, "clarity": 82, "accuracy": 90},
+    passed=True,
+)
+
+print("Passed:", result.passed)
+print("Scores:", result.scores)
+```
+</TabItem>
+</Tabs>

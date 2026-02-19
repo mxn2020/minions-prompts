@@ -1,0 +1,66 @@
+---
+title: Version Chains
+description: How follows relations form a linear version history.
+---
+
+## What is a Version Chain?
+
+A version chain is the ordered sequence of prompt versions connected by `follows` relations:
+
+```
+prompt-template (root)
+    ↑ follows
+prompt-version v1
+    ↑ follows
+prompt-version v2  ← latest
+```
+
+The `follows` relation is directional: the `sourceId` is the **newer** version, and `targetId` is the **older** version. This allows traversal backward to the root.
+
+## PromptChain API
+
+The `PromptChain` class traverses the graph for you:
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+<Tabs>
+<TabItem label="TypeScript">
+```typescript
+import { PromptChain } from 'minions-prompts';
+
+const chain = new PromptChain(storage);
+
+// All versions, oldest first
+const all = await chain.getVersionChain(promptId);
+
+// The most recent leaf version
+const latest = await chain.getLatestVersion(promptId);
+
+// The version active on January 1, 2024
+const historical = await chain.getVersionAtDate(promptId, new Date('2024-01-01'));
+```
+</TabItem>
+<TabItem label="Python">
+```python
+from minions_prompts import PromptChain
+from datetime import datetime
+
+chain = PromptChain(storage)
+
+# All versions, oldest first
+all_versions = chain.get_version_chain(prompt_id)
+
+# The most recent leaf version
+latest = chain.get_latest_version(prompt_id)
+
+# The version active on January 1, 2024
+historical = chain.get_version_at_date(prompt_id, datetime(2024, 1, 1))
+```
+</TabItem>
+</Tabs>
+
+## Branching
+
+A version chain can branch — multiple versions can follow the same predecessor. The "latest" version is the leaf with the most recent `createdAt` timestamp.
+
+This is useful for maintaining different variations (e.g., one for GPT-4, one for Claude) from the same base.

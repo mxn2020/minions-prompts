@@ -1,0 +1,103 @@
+---
+title: Variable Interpolation
+description: Learn how to use {{variables}}, {{#if blocks}}, and {{#each loops}} in prompt templates.
+---
+
+## Basic Substitution
+
+Use double curly braces to define variable placeholders:
+
+```
+You are a {{role}} assistant helping {{user_name}}.
+Your task: {{task}}
+```
+
+Variable names must match `[a-zA-Z_][a-zA-Z0-9_]*`. Leading/trailing whitespace inside `{{ }}` is trimmed.
+
+## Conditional Blocks
+
+Use `{{#if variable}}` to include content only when a variable is truthy:
+
+```
+Answer the following question.
+{{#if context}}
+Context: {{context}}
+{{/if}}
+Question: {{question}}
+```
+
+A value is truthy if it is non-null, non-empty, not `false`, and not an empty array.
+
+## Iteration Blocks
+
+Use `{{#each array}}` to iterate over a list:
+
+```
+Analyze the following items:
+{{#each items}}
+- {{this}}
+{{/each}}
+```
+
+For arrays of objects:
+
+```
+Here are the team members:
+{{#each members}}
+- {{name}} ({{role}})
+{{/each}}
+```
+
+## Rendering
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+<Tabs>
+<TabItem label="TypeScript">
+```typescript
+import { PromptRenderer } from 'minions-prompts';
+
+const renderer = new PromptRenderer();
+
+const result = renderer.render(
+  'Hello {{name}}, {{#if premium}}you have premium access.{{/if}}',
+  { name: 'Alice', premium: true },
+);
+// → "Hello Alice, you have premium access."
+```
+</TabItem>
+<TabItem label="Python">
+```python
+from minions_prompts import PromptRenderer
+
+renderer = PromptRenderer()
+
+result = renderer.render(
+    "Hello {{name}}, {{#if premium}}you have premium access.{{/if}}",
+    {"name": "Alice", "premium": True},
+)
+# → "Hello Alice, you have premium access."
+```
+</TabItem>
+</Tabs>
+
+## Required Variables
+
+Mark variables as required to get clear errors when they are missing:
+
+<Tabs>
+<TabItem label="TypeScript">
+```typescript
+renderer.render(template, variables, {
+  requiredVariables: ['topic', 'audience'],
+});
+// Throws RendererError if topic or audience are missing
+```
+</TabItem>
+<TabItem label="Python">
+```python
+renderer.render(template, variables, required_variables=["topic", "audience"])
+# Raises RendererError if topic or audience are missing
+```
+</TabItem>
+</Tabs>
