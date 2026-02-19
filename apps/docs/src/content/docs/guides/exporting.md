@@ -1,0 +1,88 @@
+---
+title: Exporting to LangChain & LlamaIndex
+description: Export your versioned prompts to popular framework formats.
+---
+
+## Supported Formats
+
+| Format | Description |
+|--------|-------------|
+| `raw` | Plain string with variables substituted |
+| `langchain` | LangChain `PromptTemplate` constructor object |
+| `llamaindex` | LlamaIndex `PromptTemplate` object |
+| `json` | Full structured export with version history |
+
+## LangChain Export
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+<Tabs>
+<TabItem label="TypeScript">
+```typescript
+import { PromptExporter } from 'minions-prompts';
+
+const exporter = new PromptExporter(storage);
+const langchain = await exporter.toLangChain(promptId);
+
+// Use with LangChain:
+// const template = new PromptTemplate(langchain);
+console.log(langchain);
+// {
+//   template: "Summarize {{topic}} for {{audience}}.",
+//   inputVariables: ["topic", "audience"],
+//   outputParser: null
+// }
+```
+</TabItem>
+<TabItem label="Python">
+```python
+from minions_prompts import PromptExporter
+
+exporter = PromptExporter(storage)
+langchain_export = exporter.to_lang_chain(prompt_id)
+
+# Use with LangChain:
+# from langchain.prompts import PromptTemplate
+# template = PromptTemplate(
+#     template=langchain_export.template,
+#     input_variables=langchain_export.input_variables,
+# )
+```
+</TabItem>
+</Tabs>
+
+## LlamaIndex Export
+
+<Tabs>
+<TabItem label="TypeScript">
+```typescript
+const llamaindex = await exporter.toLlamaIndex(promptId);
+// {
+//   template: "Summarize {{topic}} for {{audience}}.",
+//   templateVars: ["topic", "audience"]
+// }
+```
+</TabItem>
+<TabItem label="Python">
+```python
+llamaindex_export = exporter.to_llama_index(prompt_id)
+# LlamaIndexExport(
+#   template="Summarize {{topic}} for {{audience}}.",
+#   template_vars=["topic", "audience"]
+# )
+```
+</TabItem>
+</Tabs>
+
+## CLI Export
+
+```bash
+# Export to LangChain format
+prompts export <id> --format langchain
+
+# Export to file
+prompts export <id> --format json --output prompt-export.json
+
+# Render with variables
+prompts export <id> --format raw --vars topic=AI audience=engineers
+```

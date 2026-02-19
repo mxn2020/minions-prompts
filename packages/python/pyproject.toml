@@ -1,0 +1,31 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "minions-prompts"
+version = "0.1.0"
+description = "Version-controlled prompt engineering system built on the Minions SDK"
+readme = "README.md"
+license = { text = "AGPL-3.0" }
+requires-python = ">=3.10"
+dependencies = [
+    "minions-sdk>=0.2.0",
+]
+keywords = ["ai", "prompts", "minions", "versioning", "llm"]
+authors = [
+    { name = "Mehdi Nabhani", email = "mehdi@the-mehdi.com" }
+]
+
+[project.urls]
+Homepage = "https://github.com/mxn2020/minions-prompts"
+Repository = "https://github.com/mxn2020/minions-prompts"
+
+[tool.hatch.build.targets.wheel]
+packages = ["minions_prompts"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

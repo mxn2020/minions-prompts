@@ -1,0 +1,92 @@
+---
+title: A/B Testing Prompts
+description: Compare two prompt versions against identical test inputs.
+---
+
+## Why A/B Test Prompts?
+
+A/B testing lets you make evidence-based decisions about prompt changes. Instead of "version 2 feels better," you get concrete score deltas across multiple test cases.
+
+## Setup
+
+You need:
+1. Two prompt versions (`v1` and `v2`)
+2. A set of test cases with input variables
+3. Evaluations (scores) for both versions
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+<Tabs>
+<TabItem label="TypeScript">
+```typescript
+import { PromptScorer } from 'minions-prompts';
+
+const scorer = new PromptScorer(storage);
+
+const comparisons = await scorer.compareVersions(
+  v1.id,
+  v2.id,
+  [test1.id, test2.id, test3.id],
+  // v1 evaluations
+  [
+    { scores: { relevance: 78, clarity: 80 }, passed: true },
+    { scores: { relevance: 72, clarity: 75 }, passed: true },
+    { scores: { relevance: 85, clarity: 88 }, passed: true },
+  ],
+  // v2 evaluations
+  [
+    { scores: { relevance: 85, clarity: 87 }, passed: true },
+    { scores: { relevance: 80, clarity: 82 }, passed: true },
+    { scores: { relevance: 88, clarity: 91 }, passed: true },
+  ],
+);
+
+for (const cmp of comparisons) {
+  console.log(`Test ${cmp.testId}: winner = ${cmp.winner}`);
+  console.log('Deltas:', cmp.deltas);
+}
+```
+</TabItem>
+<TabItem label="Python">
+```python
+from minions_prompts import PromptScorer
+
+scorer = PromptScorer(storage)
+
+comparisons = scorer.compare_versions(
+    v1.id,
+    v2.id,
+    [test1.id, test2.id, test3.id],
+    # v1 evaluations
+    [
+        {"scores": {"relevance": 78, "clarity": 80}, "passed": True},
+        {"scores": {"relevance": 72, "clarity": 75}, "passed": True},
+        {"scores": {"relevance": 85, "clarity": 88}, "passed": True},
+    ],
+    # v2 evaluations
+    [
+        {"scores": {"relevance": 85, "clarity": 87}, "passed": True},
+        {"scores": {"relevance": 80, "clarity": 82}, "passed": True},
+        {"scores": {"relevance": 88, "clarity": 91}, "passed": True},
+    ],
+)
+
+for cmp in comparisons:
+    print(f"Test {cmp.test_id}: winner = {cmp.winner}")
+    print("Deltas:", cmp.deltas)
+```
+</TabItem>
+</Tabs>
+
+## Interpreting Results
+
+The `deltas` field shows the score difference per dimension (positive = v2 is better):
+
+```json
+{
+  "relevance": 7,
+  "clarity": 7
+}
+```
+
+The `winner` field is `"v1"`, `"v2"`, or `"tie"` based on total delta.

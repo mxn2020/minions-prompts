@@ -1,0 +1,186 @@
+---
+title: Quick Start
+description: Create your first versioned prompt in 5 minutes.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+## 1. Create a prompt template
+
+<Tabs>
+<TabItem label="TypeScript">
+```typescript
+import { createMinion } from 'minions-sdk';
+import { promptTemplateType, InMemoryStorage } from 'minions-prompts';
+
+const storage = new InMemoryStorage();
+
+const { minion: template } = createMinion(
+  {
+    title: 'Email Summarizer',
+    fields: {
+      content: 'Summarize the following email in {{tone}} tone for {{audience}}:\n\n{{email}}',
+      variables: ['tone', 'audience', 'email'],
+    },
+  },
+  promptTemplateType,
+);
+await storage.saveMinion(template);
+console.log('Created:', template.id);
+```
+</TabItem>
+<TabItem label="Python">
+```python
+from minions import create_minion
+from minions_prompts import prompt_template_type, InMemoryStorage
+
+storage = InMemoryStorage()
+
+template, _ = create_minion(
+    {
+        "title": "Email Summarizer",
+        "fields": {
+            "content": "Summarize the following email in {{tone}} tone for {{audience}}:\n\n{{email}}",
+            "variables": ["tone", "audience", "email"],
+        },
+    },
+    prompt_template_type,
+)
+storage.save_minion(template)
+print("Created:", template.id)
+```
+</TabItem>
+</Tabs>
+
+## 2. Render it with variables
+
+<Tabs>
+<TabItem label="TypeScript">
+```typescript
+import { PromptRenderer } from 'minions-prompts';
+
+const renderer = new PromptRenderer();
+const rendered = renderer.render(
+  template.fields.content,
+  {
+    tone: 'professional',
+    audience: 'executives',
+    email: 'Hi, just checking in on the Q3 report...',
+  },
+);
+console.log(rendered);
+```
+</TabItem>
+<TabItem label="Python">
+```python
+from minions_prompts import PromptRenderer
+
+renderer = PromptRenderer()
+rendered = renderer.render(
+    template.fields["content"],
+    {
+        "tone": "professional",
+        "audience": "executives",
+        "email": "Hi, just checking in on the Q3 report...",
+    },
+)
+print(rendered)
+```
+</TabItem>
+</Tabs>
+
+## 3. Create a new version
+
+<Tabs>
+<TabItem label="TypeScript">
+```typescript
+import { createMinion, generateId, now } from 'minions-sdk';
+import { promptVersionType } from 'minions-prompts';
+
+const { minion: v2 } = createMinion(
+  {
+    title: 'Email Summarizer v2',
+    fields: {
+      content: 'Produce a {{length}}-sentence summary of this email in {{tone}} tone for {{audience}}:\n\n{{email}}',
+      changelog: 'Added length control',
+      versionNumber: 2,
+      variables: ['length', 'tone', 'audience', 'email'],
+    },
+  },
+  promptVersionType,
+);
+await storage.saveMinion(v2);
+await storage.saveRelation({
+  id: generateId(),
+  sourceId: v2.id,
+  targetId: template.id,
+  type: 'follows',
+  createdAt: now(),
+});
+```
+</TabItem>
+<TabItem label="Python">
+```python
+from minions import create_minion, generate_id, now, Relation
+from minions_prompts import prompt_version_type
+
+v2, _ = create_minion(
+    {
+        "title": "Email Summarizer v2",
+        "fields": {
+            "content": "Produce a {{length}}-sentence summary of this email in {{tone}} tone for {{audience}}:\n\n{{email}}",
+            "changelog": "Added length control",
+            "versionNumber": 2,
+            "variables": ["length", "tone", "audience", "email"],
+        },
+    },
+    prompt_version_type,
+)
+storage.save_minion(v2)
+storage.save_relation(Relation(
+    id=generate_id(),
+    source_id=v2.id,
+    target_id=template.id,
+    type="follows",
+    created_at=now(),
+))
+```
+</TabItem>
+</Tabs>
+
+## 4. View history and diff
+
+<Tabs>
+<TabItem label="TypeScript">
+```typescript
+import { PromptChain, PromptDiff } from 'minions-prompts';
+
+const chain = new PromptChain(storage);
+const versions = await chain.getVersionChain(template.id);
+console.log(`${versions.length} versions`);
+
+const differ = new PromptDiff();
+const diff = differ.diff(template, v2);
+console.log(differ.format(diff, true)); // colored output
+```
+</TabItem>
+<TabItem label="Python">
+```python
+from minions_prompts import PromptChain, PromptDiff
+
+chain = PromptChain(storage)
+versions = chain.get_version_chain(template.id)
+print(f"{len(versions)} versions")
+
+differ = PromptDiff()
+diff = differ.diff(template, v2)
+print(differ.format(diff, colored=True))
+```
+</TabItem>
+</Tabs>
+
+## Next steps
+
+- [Core Concepts: Variable Interpolation](/concepts/variables/)
+- [Guide: Writing Effective Tests](/guides/writing-tests/)
+- [CLI Reference](/cli/)

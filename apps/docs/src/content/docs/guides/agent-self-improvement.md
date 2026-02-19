@@ -1,0 +1,91 @@
+---
+title: Agent Self-Improvement
+description: Build agents that version their own system prompts.
+---
+
+## The Concept
+
+AI agents can use `minions-prompts` to version their own system prompts. When an agent detects that its current prompt is underperforming (via low test scores), it can:
+
+1. Roll back to a previous version that scored better
+2. Create a new version with improvements
+3. Run A/B tests on candidate improvements before deploying
+
+This is **self-improvement infrastructure** for AI agents.
+
+## Example: Adaptive Agent
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+<Tabs>
+<TabItem label="TypeScript">
+```typescript
+import { PromptChain, PromptScorer } from 'minions-prompts';
+
+async function adaptAgent(storage, promptId: string, testIds: string[]) {
+  const scorer = new PromptScorer(storage);
+  const chain = new PromptChain(storage);
+
+  // Evaluate current version
+  const evaluations = testIds.map(() => ({
+    scores: { relevance: Math.random() * 100 },
+    passed: true,
+  }));
+  const results = await scorer.runTestSuite(promptId, testIds, evaluations);
+
+  // Compute average relevance
+  const avgRelevance =
+    results.reduce((sum, r) => sum + (r.scores['relevance'] ?? 0), 0) / results.length;
+
+  if (avgRelevance < 75) {
+    // Roll back to previous version
+    const versions = await chain.getVersionChain(promptId);
+    if (versions.length >= 2) {
+      const previousVersion = versions[versions.length - 2];
+      console.log(`Score ${avgRelevance.toFixed(1)} < 75. Rolling back to: ${previousVersion?.id}`);
+      return previousVersion?.id;
+    }
+  }
+
+  return promptId; // Continue with current version
+}
+```
+</TabItem>
+<TabItem label="Python">
+```python
+from minions_prompts import PromptChain, PromptScorer
+import random
+
+def adapt_agent(storage, prompt_id: str, test_ids: list[str]) -> str:
+    scorer = PromptScorer(storage)
+    chain = PromptChain(storage)
+
+    # Evaluate current version
+    evaluations = [
+        {"scores": {"relevance": random.uniform(60, 100)}, "passed": True}
+        for _ in test_ids
+    ]
+    results = scorer.run_test_suite(prompt_id, test_ids, evaluations)
+
+    # Compute average relevance
+    avg_relevance = sum(r.scores.get("relevance", 0) for r in results) / len(results)
+
+    if avg_relevance < 75:
+        versions = chain.get_version_chain(prompt_id)
+        if len(versions) >= 2:
+            previous = versions[-2]
+            print(f"Score {avg_relevance:.1f} < 75. Rolling back to: {previous.id}")
+            return previous.id
+
+    return prompt_id  # Continue with current version
+```
+</TabItem>
+</Tabs>
+
+## Production Workflow
+
+1. **Instrument your agent**: After each conversation, run relevant test cases and record scores
+2. **Set thresholds**: Define minimum acceptable scores per dimension
+3. **Automate rollback**: If scores drop below threshold, automatically switch to the previous version
+4. **Flag for human review**: When a rollback occurs, alert a human to investigate and create an improved version
+5. **A/B test improvements**: Before deploying a new version, run it against the same test battery as the current version

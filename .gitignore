@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.turbo/
+*.tsbuildinfo
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+dist/
+build/
+.astro/
+.env
+.env.local
+coverage/
+.pytest_cache/
