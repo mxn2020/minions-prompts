@@ -13,3 +13,5 @@ build/
 .env.local
 coverage/
 .pytest_cache/
+PROMPT.md
+PROMPTS.md
