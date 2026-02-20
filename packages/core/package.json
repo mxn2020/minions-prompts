@@ -19,7 +19,7 @@
     "docs": "typedoc"
   },
   "dependencies": {
-    "minions-sdk": "^0.2.0"
+    "minions-sdk": "^0.2.1"
   },
   "devDependencies": {
     "@types/node": "^25.3.0",
