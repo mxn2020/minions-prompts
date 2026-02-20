@@ -1,6 +1,6 @@
 {
   "name": "@minions-prompts/sdk",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Version-controlled prompt engineering system built on the Minions SDK",
   "type": "module",
   "main": "./dist/index.js",
