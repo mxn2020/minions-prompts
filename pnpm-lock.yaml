@@ -105,8 +105,8 @@ importers:
         specifier: ^13.2.5
         version: 13.2.5(@types/node@25.3.0)
       minions-sdk:
-        specifier: link:../../../minions/packages/core
-        version: link:../../../minions/packages/core
+        specifier: 0.2.2
+        version: 0.2.2
     devDependencies:
       '@types/node':
         specifier: ^25.3.0
@@ -118,8 +118,8 @@ importers:
   packages/core:
     dependencies:
       minions-sdk:
-        specifier: link:../../../minions/packages/core
-        version: link:../../../minions/packages/core
+        specifier: 0.2.2
+        version: 0.2.2
     devDependencies:
       '@types/node':
         specifier: ^25.3.0
@@ -2246,6 +2246,9 @@ packages:
   minimatch@9.0.5:
     resolution: {integrity: sha512-G6T0ZX48xgozx7587koeX9Ys2NYy6Gmv//P89sEte9V9whIapMNF4idKxnW2QtCcLiTWlb/wfCabAtAFWhhBow==}
     engines: {node: '>=16 || 14 >=14.17'}
+
+  minions-sdk@0.2.2:
+    resolution: {integrity: sha512-O/BPnCV1CW2rAhNHmgJWU+OpCqzWfWaPPCEXYRRWf0yo5puJVXNdqlz/HjEHmbIws1YY6CJJrqfcP03dfKD11A==}
 
   motion-dom@12.34.3:
     resolution: {integrity: sha512-sYgFe+pR9aIM7o4fhs2aXtOI+oqlUd33N9Yoxcgo1Fv7M20sRkHtCmzE/VRNIcq7uNJ+qio+Xubt1FXH3pQ+eQ==}
@@ -5526,6 +5529,8 @@ snapshots:
   minimatch@9.0.5:
     dependencies:
       brace-expansion: 2.0.2
+
+  minions-sdk@0.2.2: {}
 
   motion-dom@12.34.3:
     dependencies:
