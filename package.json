@@ -8,7 +8,8 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "pnpm --filter @minions-prompts/sdk run build && pnpm --filter @minions-prompts/cli run build && pnpm --filter minions-prompts-docs run build && pnpm --filter minions-prompts-web run build",
+    "build": "pnpm --filter @minions-prompts/sdk run build && pnpm --filter @minions-prompts/cli run build && pnpm --filter minions-prompts-docs run build && pnpm --filter minions-prompts-blog run build && pnpm --filter minions-prompts-web run build",
+    "deploy:blog": "pnpm --filter minions-prompts-blog run build && netlify deploy --dir apps/blog/dist --prod",
     "test": "pnpm --filter @minions-prompts/sdk run test",
     "lint": "pnpm --filter @minions-prompts/sdk run build && pnpm --filter @minions-prompts/sdk run lint && pnpm --filter @minions-prompts/cli run lint"
   },
