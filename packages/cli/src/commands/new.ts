@@ -4,7 +4,7 @@
  */
 
 import { createMinion, generateId, now } from 'minions-sdk';
-import { promptTemplateType } from 'minions-prompts';
+import { promptTemplateType } from '@minions-prompts/sdk';
 import chalk from 'chalk';
 import type { FileStorage } from '../storage.js';
 

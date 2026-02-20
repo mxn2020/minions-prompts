@@ -3,7 +3,7 @@
  * Export a prompt to various formats.
  */
 
-import { PromptExporter } from 'minions-prompts';
+import { PromptExporter } from '@minions-prompts/sdk';
 import chalk from 'chalk';
 import { writeFileSync } from 'node:fs';
 import type { FileStorage } from '../storage.js';

@@ -11,7 +11,7 @@ export default defineConfig({
     },
     base: '/',
     optimizeDeps: {
-        include: ['minions-prompts'],
+        include: ['@minions-prompts/sdk'],
     },
     build: {
         commonjsOptions: {

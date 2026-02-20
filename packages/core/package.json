@@ -1,5 +1,5 @@
 {
-  "name": "minions-prompts",
+  "name": "@minions-prompts/sdk",
   "version": "0.1.0",
   "description": "Version-controlled prompt engineering system built on the Minions SDK",
   "type": "module",

@@ -3,7 +3,7 @@
  * Show colored diff between two versions.
  */
 
-import { PromptDiff } from 'minions-prompts';
+import { PromptDiff } from '@minions-prompts/sdk';
 import chalk from 'chalk';
 import type { FileStorage } from '../storage.js';
 

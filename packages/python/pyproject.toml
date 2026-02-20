@@ -9,13 +9,16 @@ description = "Version-controlled prompt engineering system built on the Minions
 readme = "README.md"
 license = { text = "AGPL-3.0" }
 requires-python = ">=3.10"
-dependencies = [
-    "minions-sdk>=0.2.0",
-]
 keywords = ["ai", "prompts", "minions", "versioning", "llm"]
 authors = [
     { name = "Mehdi Nabhani", email = "mehdi@the-mehdi.com" }
 ]
+dependencies = [
+    "minions-sdk>=0.2.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7.0"]
 
 [project.urls]
 Homepage = "https://github.com/mxn2020/minions-prompts"

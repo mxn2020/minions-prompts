@@ -6,7 +6,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Minion, Relation } from 'minions-sdk';
-import type { PromptStorage } from 'minions-prompts';
+import type { PromptStorage } from '@minions-prompts/sdk';
 
 function getDataDir(): string {
   // Walk up from cwd to find .promptsrc.json, fallback to cwd

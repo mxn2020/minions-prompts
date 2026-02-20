@@ -1,7 +1,7 @@
 import { CodeBlock } from '../shared/CodeBlock';
 import { TabGroup } from '../shared/TabGroup';
 
-const tsCode = `import { PromptChain, PromptRenderer } from 'minions-prompts';
+const tsCode = `import { PromptChain, PromptRenderer } from '@minions-prompts/sdk';
 
 // Create a versioned template
 const chain = new PromptChain();

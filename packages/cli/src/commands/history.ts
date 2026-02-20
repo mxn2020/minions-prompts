@@ -3,7 +3,7 @@
  * Show version history chain.
  */
 
-import { PromptChain } from 'minions-prompts';
+import { PromptChain } from '@minions-prompts/sdk';
 import chalk from 'chalk';
 import type { FileStorage } from '../storage.js';
 

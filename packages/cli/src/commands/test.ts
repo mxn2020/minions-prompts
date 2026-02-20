@@ -3,7 +3,7 @@
  * Run a test case against a prompt.
  */
 
-import { PromptScorer } from 'minions-prompts';
+import { PromptScorer } from '@minions-prompts/sdk';
 import chalk from 'chalk';
 import type { FileStorage } from '../storage.js';
 

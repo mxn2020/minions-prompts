@@ -8,7 +8,7 @@
  *   PromptChain, PromptRenderer, PromptDiff, PromptScorer, PromptExporter,
  *   InMemoryStorage, registerPromptTypes,
  *   promptTemplateType, promptVersionType,
- * } from 'minions-prompts';
+ * } from '@minions-prompts/sdk';
  * import { createMinion, generateId, now } from 'minions-sdk';
  *
  * const storage = new InMemoryStorage();

@@ -3,7 +3,7 @@
  * Render a prompt with variable substitution.
  */
 
-import { PromptRenderer } from 'minions-prompts';
+import { PromptRenderer } from '@minions-prompts/sdk';
 import chalk from 'chalk';
 import { readFileSync } from 'node:fs';
 import type { FileStorage } from '../storage.js';

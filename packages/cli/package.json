@@ -1,5 +1,5 @@
 {
-  "name": "minions-prompts-cli",
+  "name": "@minions-prompts/cli",
   "version": "0.1.0",
   "description": "CLI for minions-prompts — version-controlled prompt engineering",
   "type": "module",
@@ -16,7 +16,7 @@
     "chalk": "^5.6.2",
     "commander": "^14.0.3",
     "inquirer": "^13.2.5",
-    "minions-prompts": "workspace:*",
+    "@minions-prompts/sdk": "workspace:*",
     "minions-sdk": "^0.2.0"
   },
   "devDependencies": {
