@@ -139,4 +139,137 @@ describe('PromptScorer', () => {
 
     expect(comparisons[0]!.winner).toBe('tie');
   });
+
+  // --- New tests ---
+
+  it('runTestSuite with empty test id array returns empty results', async () => {
+    const prompt = makePrompt('pempty', 'Hello {{name}}');
+    await storage.saveMinion(prompt);
+
+    const results = await scorer.runTestSuite('pempty', [], []);
+    expect(results).toHaveLength(0);
+  });
+
+  it('runTestSuite with all tests failing returns results all with passed=false', async () => {
+    const prompt = makePrompt('pfail', '{{q}}');
+    const t1 = makeTest('tf1', { q: 'question one' });
+    const t2 = makeTest('tf2', { q: 'question two' });
+    await storage.saveMinion(prompt);
+    await storage.saveMinion(t1);
+    await storage.saveMinion(t2);
+
+    const results = await scorer.runTestSuite(
+      'pfail',
+      ['tf1', 'tf2'],
+      [
+        { scores: { quality: 20 }, passed: false },
+        { scores: { quality: 10 }, passed: false },
+      ],
+    );
+
+    expect(results).toHaveLength(2);
+    expect(results[0]!.passed).toBe(false);
+    expect(results[1]!.passed).toBe(false);
+  });
+
+  it('runTest with no scores passes and scores is empty object', async () => {
+    const prompt = makePrompt('pnoscore', 'Static prompt');
+    const test = makeTest('tnoscore', {});
+    await storage.saveMinion(prompt);
+    await storage.saveMinion(test);
+
+    const result = await scorer.runTest('pnoscore', 'tnoscore', {
+      scores: {},
+      passed: true,
+    });
+
+    expect(result.passed).toBe(true);
+    expect(result.scores).toEqual({});
+  });
+
+  it('compareVersions with v1 winning (higher score) has winner as v1', async () => {
+    const v1 = makePrompt('win1', 'Version one {{x}}');
+    const v2 = makePrompt('win2', 'Version two {{x}}');
+    const test = makeTest('twin', { x: 'input' });
+    await storage.saveMinion(v1);
+    await storage.saveMinion(v2);
+    await storage.saveMinion(test);
+
+    const comparisons = await scorer.compareVersions(
+      'win1',
+      'win2',
+      ['twin'],
+      [{ scores: { quality: 95 }, passed: true }],
+      [{ scores: { quality: 50 }, passed: false }],
+    );
+
+    expect(comparisons[0]!.winner).toBe('v1');
+    // v2 score - v1 score = 50 - 95 = -45
+    expect(comparisons[0]!.deltas['quality']).toBe(-45);
+  });
+
+  it('runTestSuite result minions are all saved in storage', async () => {
+    const prompt = makePrompt('psaved', '{{item}}');
+    const t1 = makeTest('tsaved1', { item: 'apple' });
+    const t2 = makeTest('tsaved2', { item: 'banana' });
+    const t3 = makeTest('tsaved3', { item: 'cherry' });
+    await storage.saveMinion(prompt);
+    await storage.saveMinion(t1);
+    await storage.saveMinion(t2);
+    await storage.saveMinion(t3);
+
+    await scorer.runTestSuite(
+      'psaved',
+      ['tsaved1', 'tsaved2', 'tsaved3'],
+      [
+        { scores: { score: 70 }, passed: true },
+        { scores: { score: 80 }, passed: true },
+        { scores: { score: 90 }, passed: true },
+      ],
+    );
+
+    const allMinions = storage.getAllMinions();
+    const resultMinions = allMinions.filter(
+      (m) => m.minionTypeId === 'minions-prompts/prompt-result',
+    );
+    // One result minion per test
+    expect(resultMinions).toHaveLength(3);
+  });
+
+  it('compareVersions with multiple test cases returns multiple comparison results', async () => {
+    const v1 = makePrompt('mv1', 'Prompt A: {{topic}}');
+    const v2 = makePrompt('mv2', 'Prompt B: {{topic}}');
+    const t1 = makeTest('mt1', { topic: 'science' });
+    const t2 = makeTest('mt2', { topic: 'history' });
+    const t3 = makeTest('mt3', { topic: 'math' });
+    await storage.saveMinion(v1);
+    await storage.saveMinion(v2);
+    await storage.saveMinion(t1);
+    await storage.saveMinion(t2);
+    await storage.saveMinion(t3);
+
+    const comparisons = await scorer.compareVersions(
+      'mv1',
+      'mv2',
+      ['mt1', 'mt2', 'mt3'],
+      [
+        { scores: { relevance: 60 }, passed: true },
+        { scores: { relevance: 70 }, passed: true },
+        { scores: { relevance: 80 }, passed: true },
+      ],
+      [
+        { scores: { relevance: 65 }, passed: true },
+        { scores: { relevance: 65 }, passed: true },
+        { scores: { relevance: 85 }, passed: true },
+      ],
+    );
+
+    expect(comparisons).toHaveLength(3);
+    // mt1: v2 wins (65 > 60)
+    expect(comparisons[0]!.winner).toBe('v2');
+    // mt2: v1 wins (70 > 65)
+    expect(comparisons[1]!.winner).toBe('v1');
+    // mt3: v2 wins (85 > 80)
+    expect(comparisons[2]!.winner).toBe('v2');
+  });
 });

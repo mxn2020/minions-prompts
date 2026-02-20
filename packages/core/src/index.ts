@@ -63,3 +63,6 @@ export type {
   ComparisonResult,
   PromptStorage,
 } from './types.js';
+
+// Client
+export { PromptsPlugin, MinionsPrompts } from './client/index.js';

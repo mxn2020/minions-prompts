@@ -227,6 +227,13 @@ export const promptTypes = [
 export function registerPromptTypes(registry?: TypeRegistry): TypeRegistry {
   const reg = registry ?? new TypeRegistry();
   for (const type of promptTypes) {
+    if (reg.has(type.id)) continue;
+
+    const existing = reg.getBySlug(type.slug);
+    if (existing) {
+      reg.remove(existing.id);
+    }
+
     reg.register(type);
   }
   return reg;

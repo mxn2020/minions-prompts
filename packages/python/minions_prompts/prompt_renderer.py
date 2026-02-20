@@ -142,7 +142,7 @@ class PromptRenderer:
 
     @staticmethod
     def _is_truthy(value: Any) -> bool:
-        if value is None or value is False or value == "":
+        if value is None or value is False or value == "" or value == 0:
             return False
         if isinstance(value, list) and len(value) == 0:
             return False

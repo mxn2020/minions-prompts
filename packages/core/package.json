@@ -1,6 +1,6 @@
 {
   "name": "@minions-prompts/sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Version-controlled prompt engineering system built on the Minions SDK",
   "type": "module",
   "main": "./dist/index.js",
@@ -15,13 +15,16 @@
     "build": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "docs": "typedoc"
   },
   "dependencies": {
     "minions-sdk": "^0.2.0"
   },
   "devDependencies": {
     "@types/node": "^25.3.0",
+    "typedoc": "^0.26.0",
+    "typedoc-plugin-markdown": "^4.0.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   },

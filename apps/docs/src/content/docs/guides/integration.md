@@ -1,0 +1,198 @@
+---
+title: Integrating with LangChain & LlamaIndex
+description: How to export prompts to LangChain PromptTemplate and LlamaIndex formats.
+---
+
+## Overview
+
+`minions-prompts` maintains prompts as versioned objects, but the runtime that actually calls your LLM may be LangChain or LlamaIndex. The export methods `toLangChain()` and `toLlamaIndex()` bridge the two worlds: you keep version control and test scoring in `minions-prompts` and hand off a native framework object at call time.
+
+---
+
+## LangChain export
+
+### TypeScript — `@langchain/core`
+
+```typescript
+import { createMinion } from 'minions-sdk';
+import {
+  promptTemplateType,
+  InMemoryStorage,
+  PromptExporter,
+} from 'minions-prompts';
+import { ChatOpenAI } from '@langchain/openai';
+
+// 1. Build and persist the prompt
+const storage = new InMemoryStorage();
+const { minion: template } = createMinion(
+  {
+    title: 'Product description',
+    fields: {
+      content: 'Write a compelling product description for {{productName}}. Target audience: {{audience}}. Tone: {{tone}}.',
+    },
+  },
+  promptTemplateType,
+);
+await storage.saveMinion(template);
+
+// 2. Export to LangChain PromptTemplate
+const exporter = new PromptExporter();
+const langchainPrompt = exporter.toLangChain(template);
+// langchainPrompt is a LangChain PromptTemplate with input_variables
+// ['productName', 'audience', 'tone'] extracted automatically
+
+// 3. Use directly in a chain
+const llm = new ChatOpenAI({ model: 'gpt-4o' });
+const chain = langchainPrompt.pipe(llm);
+
+const result = await chain.invoke({
+  productName: 'Noise-cancelling headphones',
+  audience: 'remote workers',
+  tone: 'professional but warm',
+});
+console.log(result.content);
+```
+
+### Python — `langchain`
+
+```python
+from minions import create_minion
+from minions_prompts import (
+    prompt_template_type,
+    InMemoryStorage,
+    PromptExporter,
+)
+from langchain_openai import ChatOpenAI
+
+storage = InMemoryStorage()
+template, _ = create_minion(
+    {
+        "title": "Product description",
+        "fields": {
+            "content": "Write a compelling product description for {{productName}}. "
+                       "Target audience: {{audience}}. Tone: {{tone}}."
+        },
+    },
+    prompt_template_type,
+)
+storage.save_minion(template)
+
+exporter = PromptExporter()
+lc_prompt = exporter.to_langchain(template)
+
+llm = ChatOpenAI(model="gpt-4o")
+chain = lc_prompt | llm
+
+result = chain.invoke({
+    "productName": "Noise-cancelling headphones",
+    "audience": "remote workers",
+    "tone": "professional but warm",
+})
+print(result.content)
+```
+
+### Variable mapping
+
+`minions-prompts` uses `{{doubleCurly}}` syntax internally. The LangChain exporter converts these to LangChain's `{singleCurly}` format and populates `input_variables` automatically. You do not need to declare variables manually.
+
+| minions-prompts | LangChain |
+|---|---|
+| `{{productName}}` | `{productName}` |
+| `{{#if condition}}...{{/if}}` | Rendered to a static string before export |
+| `{{#each items}}` | Rendered to a static string before export |
+
+Conditional and loop blocks are evaluated at export time with any variables you supply as a `context` argument:
+
+```typescript
+const langchainPrompt = exporter.toLangChain(template, {
+  renderContext: { showPricing: true },
+});
+```
+
+---
+
+## LlamaIndex export
+
+### TypeScript — `llamaindex`
+
+```typescript
+import { createMinion } from 'minions-sdk';
+import {
+  promptTemplateType,
+  InMemoryStorage,
+  PromptExporter,
+} from 'minions-prompts';
+import { OpenAI, PromptTemplate } from 'llamaindex';
+
+const storage = new InMemoryStorage();
+const { minion: template } = createMinion(
+  {
+    title: 'Query refiner',
+    fields: {
+      content: 'Rewrite the following user query to be more precise and searchable.\n\nOriginal query: {{query}}\n\nRefined query:',
+    },
+  },
+  promptTemplateType,
+);
+await storage.saveMinion(template);
+
+const exporter = new PromptExporter();
+const llamaPrompt: PromptTemplate = exporter.toLlamaIndex(template);
+
+// Pass directly to a LlamaIndex query engine or retriever
+const llm = new OpenAI({ model: 'gpt-4o' });
+const formatted = llamaPrompt.format({ query: 'best laptop 2024 under 1000' });
+const response = await llm.complete({ prompt: formatted });
+console.log(response.text);
+```
+
+### Python — `llama_index`
+
+```python
+from minions import create_minion
+from minions_prompts import prompt_template_type, InMemoryStorage, PromptExporter
+from llama_index.core import PromptTemplate
+from llama_index.llms.openai import OpenAI
+
+storage = InMemoryStorage()
+template, _ = create_minion(
+    {
+        "title": "Query refiner",
+        "fields": {
+            "content": "Rewrite the following user query to be more precise.\n\n"
+                       "Original: {{query}}\n\nRefined:"
+        },
+    },
+    prompt_template_type,
+)
+storage.save_minion(template)
+
+exporter = PromptExporter()
+llama_prompt: PromptTemplate = exporter.to_llamaindex(template)
+
+llm = OpenAI(model="gpt-4o")
+formatted = llama_prompt.format(query="best laptop 2024 under 1000")
+response = llm.complete(formatted)
+print(response.text)
+```
+
+---
+
+## Exporting a specific version
+
+Both methods work identically with versioned prompts. Retrieve the version from storage first, then export:
+
+```typescript
+const chain = new PromptChain(storage);
+const versions = await chain.getVersionChain(templateId);
+const latestVersion = versions[versions.length - 1];
+
+const langchainPrompt = exporter.toLangChain(latestVersion);
+```
+
+## Best practices
+
+- Run `minions-prompts test <id>` before exporting a new version to production chains.
+- Cache the exported LangChain / LlamaIndex object at startup rather than calling `toLangChain()` on every request.
+- If a prompt has conditional blocks, supply a `renderContext` so the exported template is deterministic.
+- Store the `minion.id` alongside your chain definition in code so you can trace which stored version is running in production.

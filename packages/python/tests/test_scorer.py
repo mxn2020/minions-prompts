@@ -125,3 +125,126 @@ def test_compare_versions_tie(storage, scorer):
     )
 
     assert comparisons[0].winner == "tie"
+
+
+# ── New tests ──────────────────────────────────────────────────────────────────
+
+
+def test_run_test_suite_with_empty_list_returns_empty_list(storage, scorer):
+    storage.save_minion(make_prompt("pe", "{{x}}"))
+    results = scorer.run_test_suite("pe", [], [])
+    assert results == []
+
+
+def test_run_test_suite_with_all_failed_all_results_have_passed_false(storage, scorer):
+    storage.save_minion(make_prompt("pf", "{{y}}"))
+    storage.save_minion(make_test("tf1", {"y": "one"}))
+    storage.save_minion(make_test("tf2", {"y": "two"}))
+
+    results = scorer.run_test_suite(
+        "pf",
+        ["tf1", "tf2"],
+        [
+            {"scores": {"quality": 10}, "passed": False},
+            {"scores": {"quality": 20}, "passed": False},
+        ],
+    )
+
+    assert len(results) == 2
+    assert all(r.passed is False for r in results)
+
+
+def test_run_test_with_empty_scores_dict_succeeds(storage, scorer):
+    storage.save_minion(make_prompt("pg", "Static prompt"))
+    storage.save_minion(make_test("tg", {}))
+
+    result = scorer.run_test("pg", "tg", scores={}, passed=True)
+    assert result.scores == {}
+    assert result.passed is True
+
+
+def test_compare_versions_v1_wins_higher_score(storage, scorer):
+    storage.save_minion(make_prompt("vh1", "High scorer {{x}}"))
+    storage.save_minion(make_prompt("vh2", "Low scorer {{x}}"))
+    storage.save_minion(make_test("th", {"x": "test"}))
+
+    comparisons = scorer.compare_versions(
+        "vh1",
+        "vh2",
+        ["th"],
+        [{"scores": {"accuracy": 95}, "passed": True}],
+        [{"scores": {"accuracy": 40}, "passed": False}],
+    )
+
+    assert len(comparisons) == 1
+    assert comparisons[0].winner == "v1"
+
+
+def test_run_test_suite_saves_result_minions_in_storage(storage, scorer):
+    storage.save_minion(make_prompt("ps", "{{z}}"))
+    storage.save_minion(make_test("ts1", {"z": "alpha"}))
+    storage.save_minion(make_test("ts2", {"z": "beta"}))
+
+    scorer.run_test_suite(
+        "ps",
+        ["ts1", "ts2"],
+        [
+            {"scores": {"relevance": 70}, "passed": True},
+            {"scores": {"relevance": 80}, "passed": True},
+        ],
+    )
+
+    all_minions = storage.get_all_minions()
+    result_minions = [
+        m for m in all_minions if m.minion_type_id == "minions-prompts/prompt-result"
+    ]
+    assert len(result_minions) == 2
+
+
+def test_compare_versions_with_multiple_tests_multiple_comparisons(storage, scorer):
+    storage.save_minion(make_prompt("vm1", "Version 1 {{x}}"))
+    storage.save_minion(make_prompt("vm2", "Version 2 {{x}}"))
+    storage.save_minion(make_test("tm1", {"x": "first"}))
+    storage.save_minion(make_test("tm2", {"x": "second"}))
+
+    comparisons = scorer.compare_versions(
+        "vm1",
+        "vm2",
+        ["tm1", "tm2"],
+        [
+            {"scores": {"quality": 50}, "passed": True},
+            {"scores": {"quality": 60}, "passed": True},
+        ],
+        [
+            {"scores": {"quality": 70}, "passed": True},
+            {"scores": {"quality": 80}, "passed": True},
+        ],
+    )
+
+    assert len(comparisons) == 2
+
+
+def test_run_test_rendered_prompt_matches_expected_render(storage, scorer):
+    storage.save_minion(make_prompt("pr", "Dear {{title}} {{lastname}},"))
+    storage.save_minion(make_test("tr", {"title": "Dr", "lastname": "Smith"}))
+
+    result = scorer.run_test("pr", "tr", scores={"accuracy": 100}, passed=True)
+    assert result.rendered_prompt == "Dear Dr Smith,"
+
+
+def test_compare_versions_deltas_correct_negative_when_v2_scores_lower(storage, scorer):
+    storage.save_minion(make_prompt("vd1", "V1 {{x}}"))
+    storage.save_minion(make_prompt("vd2", "V2 {{x}}"))
+    storage.save_minion(make_test("td", {"x": "delta-test"}))
+
+    comparisons = scorer.compare_versions(
+        "vd1",
+        "vd2",
+        ["td"],
+        [{"scores": {"precision": 90}, "passed": True}],
+        [{"scores": {"precision": 60}, "passed": False}],
+    )
+
+    assert len(comparisons) == 1
+    assert comparisons[0].deltas["precision"] == -30
+    assert comparisons[0].winner == "v1"

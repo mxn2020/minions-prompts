@@ -17,12 +17,19 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Tutorial',
+          items: [
+            { label: 'Prompt Engineering Workflow', link: '/tutorial/prompt-engineer/' },
+          ],
+        },
+        {
           label: 'Core Concepts',
           items: [
             { label: 'Prompt Templates & Versions', link: '/concepts/templates-and-versions/' },
             { label: 'Variable Interpolation', link: '/concepts/variables/' },
             { label: 'Version Chains', link: '/concepts/version-chains/' },
             { label: 'Test-Driven Prompt Development', link: '/concepts/testing/' },
+            { label: 'Prompt Scoring', link: '/concepts/scoring/' },
           ],
         },
         {
@@ -31,7 +38,19 @@ export default defineConfig({
             { label: 'Writing Effective Tests', link: '/guides/writing-tests/' },
             { label: 'A/B Testing Prompts', link: '/guides/ab-testing/' },
             { label: 'Exporting to LangChain & LlamaIndex', link: '/guides/exporting/' },
+            { label: 'Integrating with LangChain & LlamaIndex', link: '/guides/integration/' },
             { label: 'Agent Self-Improvement', link: '/guides/agent-self-improvement/' },
+            { label: 'Custom Storage Backends', link: '/guides/storage-backends/' },
+            { label: 'Prompt Testing Strategies', link: '/guides/testing-strategies/' },
+            { label: 'Migration Guide', link: '/guides/migration/' },
+          ],
+        },
+        {
+          label: 'Reference',
+          items: [
+            { label: 'Field Types', link: '/reference/field-types/' },
+            { label: 'Storage Backends', link: '/reference/storage/' },
+            { label: 'CLI Reference', link: '/reference/cli/' },
           ],
         },
         {

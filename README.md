@@ -27,64 +27,34 @@ prompt-version v2  ← latest, tested, scored
 ## Quick Example
 
 ```typescript
-import { createMinion, generateId, now } from 'minions-sdk';
-import {
-  promptTemplateType, promptVersionType, promptTestType,
-  PromptChain, PromptRenderer, PromptDiff, PromptScorer, PromptExporter,
-  InMemoryStorage,
-} from 'minions-prompts';
+import { MinionsPrompts } from 'minions-prompts';
 
-const storage = new InMemoryStorage();
+const minions = new MinionsPrompts();
 
 // 1. Create a prompt template
-const { minion: template } = createMinion(
-  { title: 'Summarizer', fields: { content: 'Summarize {{topic}} for {{audience}}.' } },
-  promptTemplateType,
-);
-await storage.saveMinion(template);
+const template = minions.create('prompt-template', {
+  title: 'Summarizer',
+  fields: { content: 'Summarize {{topic}} for {{audience}}.' },
+});
+await minions.prompts.storage.saveMinion(template.data);
 
-// 2. Bump a version with a changelog
-const { minion: v2 } = createMinion(
-  { title: 'Summarizer v2', fields: {
-    content: 'Write a clear, engaging summary of {{topic}} for {{audience}}. Focus on practical implications.',
-    changelog: 'More specific instructions for better focus',
+// 2. Bump a version and link it
+const v2 = minions.create('prompt-version', {
+  title: 'Summarizer v2',
+  fields: {
+    content: 'Write a engaging summary of {{topic}} for {{audience}}.',
     versionNumber: 2,
-  }},
-  promptVersionType,
-);
-await storage.saveMinion(v2);
-await storage.saveRelation({ id: generateId(), sourceId: v2.id, targetId: template.id, type: 'follows', createdAt: now() });
+  },
+});
+await minions.prompts.storage.saveMinion(v2.data);
+v2.linkTo(template.data.id, 'follows');
+await minions.prompts.storage.saveRelation(minions.graph.getFromSource(v2.data.id)[0]);
 
 // 3. Show the diff
-const differ = new PromptDiff();
-console.log(differ.format(differ.diff(template, v2), true));
+console.log(minions.prompts.diff.format(minions.prompts.diff.diff(template.data, v2.data), true));
 
 // 4. Render with variables
-const renderer = new PromptRenderer();
-console.log(renderer.render(v2.fields.content, { topic: 'quantum computing', audience: 'high school students' }));
-
-// 5. Create and run a test
-const { minion: test } = createMinion(
-  { title: 'Tech test', fields: { inputVariables: { topic: 'AI agents', audience: 'developers' }, scoringDimensions: ['relevance', 'clarity'] }},
-  promptTestType,
-);
-await storage.saveMinion(test);
-
-const scorer = new PromptScorer(storage);
-const result = await scorer.runTest(v2.id, test.id, { scores: { relevance: 88, clarity: 85 }, passed: true });
-console.log('Passed:', result.passed, '| Scores:', result.scores);
-
-// 6. A/B compare v1 vs v2
-const comparisons = await scorer.compareVersions(template.id, v2.id, [test.id],
-  [{ scores: { relevance: 75, clarity: 72 }, passed: true }],
-  [{ scores: { relevance: 88, clarity: 85 }, passed: true }],
-);
-console.log('Winner:', comparisons[0].winner, '| Deltas:', comparisons[0].deltas);
-
-// 7. Export to LangChain
-const exporter = new PromptExporter(storage);
-const langchain = await exporter.toLangChain(v2.id);
-console.log(langchain);
+console.log(minions.prompts.renderer.render(v2.data.fields.content, { topic: 'AI', audience: 'devs' }));
 ```
 
 Output:
@@ -142,33 +112,26 @@ prompts test <id> --against <test-id>
 ## Python SDK
 
 ```python
-from minions import create_minion, generate_id, now, Relation
-from minions_prompts import (
-    prompt_template_type, PromptRenderer, PromptChain,
-    PromptDiff, PromptScorer, InMemoryStorage,
-)
+from minions_prompts import MinionsPrompts
 
-storage = InMemoryStorage()
+minions = MinionsPrompts()
 
 # Create
-template, _ = create_minion(
-    {"title": "Summarizer", "fields": {"content": "Summarize {{topic}} for {{audience}}."}},
-    prompt_template_type,
-)
-storage.save_minion(template)
+template = minions.create("prompt-template", {
+    "title": "Summarizer",
+    "fields": {"content": "Summarize {{topic}} for {{audience}}."}
+})
+minions.prompts.storage.save_minion(template.data)
 
 # Render
-renderer = PromptRenderer()
-rendered = renderer.render(template.fields["content"], {"topic": "AI", "audience": "developers"})
+rendered = minions.prompts.renderer.render(
+    template.data.fields["content"], 
+    {"topic": "AI", "audience": "developers"}
+)
 
 # Diff
-differ = PromptDiff()
-result = differ.diff(v1, v2)
-print(differ.format(result, colored=True))
-
-# Score
-scorer = PromptScorer(storage)
-test_result = scorer.run_test(prompt_id, test_id, scores={"relevance": 85}, passed=True)
+result = minions.prompts.diff.diff(v1.data, v2.data)
+print(minions.prompts.diff.format(result, colored=True))
 ```
 
 ---

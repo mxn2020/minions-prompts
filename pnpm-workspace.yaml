@@ -1,3 +1,7 @@
 packages:
-  - "packages/*"
-  - "apps/*"
+  - packages/*
+  - apps/*
+
+overrides:
+  core: link:minions/packages/core
+  minions-sdk: link:../minions/packages/core

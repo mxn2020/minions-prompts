@@ -1,0 +1,25 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "entryPoints": [
+        "./src/index.ts"
+    ],
+    "out": "./docs",
+    "plugin": [
+        "typedoc-plugin-markdown"
+    ],
+    "name": "@minions-prompts/sdk",
+    "readme": "none",
+    "excludePrivate": true,
+    "excludeInternal": true,
+    "includeVersion": true,
+    "categorizeByGroup": true,
+    "categoryOrder": [
+        "Schemas",
+        "Core",
+        "Storage",
+        "Types"
+    ],
+    "sort": [
+        "source-order"
+    ]
+}

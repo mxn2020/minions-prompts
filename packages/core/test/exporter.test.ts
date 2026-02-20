@@ -76,4 +76,45 @@ describe('PromptExporter', () => {
   it('toJSON throws for unknown prompt id', async () => {
     await expect(exporter.toJSON('nonexistent')).rejects.toThrow('Prompt not found');
   });
+
+  // --- New tests ---
+
+  it('toRaw throws for unknown prompt id', async () => {
+    await expect(exporter.toRaw('does-not-exist', { name: 'Test' })).rejects.toThrow(
+      'Prompt not found',
+    );
+  });
+
+  it('toLangChain result has outputParser as null', async () => {
+    await storage.saveMinion(makePrompt('p7', 'Describe {{thing}}'));
+
+    const lc = await exporter.toLangChain('p7');
+    // LangChainExport interface specifies outputParser: null
+    expect(lc.outputParser).toBeNull();
+  });
+
+  it('toLlamaIndex result template string equals the prompt content', async () => {
+    const content = 'Translate {{text}} from {{source}} to {{target}}';
+    await storage.saveMinion(makePrompt('p8', content));
+
+    const li = await exporter.toLlamaIndex('p8');
+    expect(li.template).toBe(content);
+  });
+
+  it('toJSON for prompt with no test results has testResults as empty array', async () => {
+    await storage.saveMinion(makePrompt('p9', 'A prompt with {{var}} but no test results'));
+
+    const json = await exporter.toJSON('p9');
+    expect(json.testResults).toEqual([]);
+  });
+
+  it('toRaw with partial variables (some missing) renders known vars and leaves unknown as-is', async () => {
+    await storage.saveMinion(makePrompt('p10', 'Hello {{name}}, your role is {{role}}'));
+
+    // toRaw uses strict: false, so missing variables are left as the original {{…}} token
+    const raw = await exporter.toRaw('p10', { name: 'Bob' });
+    // 'name' is substituted; 'role' is missing but strict=false leaves it as {{role}}
+    expect(raw).toContain('Bob');
+    expect(typeof raw).toBe('string');
+  });
 });

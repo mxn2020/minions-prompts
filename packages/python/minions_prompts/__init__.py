@@ -51,6 +51,7 @@ from .types import (
     TestRunResult,
     ComparisonResult,
 )
+from .client import PromptsPlugin, MinionsPrompts
 
 __all__ = [
     # Schemas
@@ -85,4 +86,7 @@ __all__ = [
     "FullJsonExport",
     "TestRunResult",
     "ComparisonResult",
+    # Client
+    "PromptsPlugin",
+    "MinionsPrompts",
 ]

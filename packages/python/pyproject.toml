@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Version-controlled prompt engineering system built on the Minions SDK"
 readme = "README.md"
 license = { text = "AGPL-3.0" }
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 keywords = ["ai", "prompts", "minions", "versioning", "llm"]
 authors = [
     { name = "Mehdi Nabhani", email = "mehdi@the-mehdi.com" }

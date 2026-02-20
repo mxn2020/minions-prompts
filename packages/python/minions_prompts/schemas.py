@@ -210,5 +210,12 @@ def register_prompt_types(registry: TypeRegistry | None = None) -> TypeRegistry:
     """
     reg = registry or TypeRegistry()
     for t in prompt_types:
+        if reg.has(t.id):
+            continue
+            
+        existing = reg.get_by_slug(t.slug)
+        if existing:
+            reg.remove(existing.id)
+            
         reg.register(t)
     return reg
