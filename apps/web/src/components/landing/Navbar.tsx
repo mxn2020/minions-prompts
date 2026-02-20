@@ -9,12 +9,12 @@ export default function Navbar() {
 
     const getDocsUrl = () => {
         if (typeof window === 'undefined') return 'https://prompts.minions.help';
-        return window.location.hostname.startsWith('dev--') ? 'https://dev--prompts-docs.netlify.app' : 'https://prompts.minions.help';
+        return window.location.hostname.startsWith('dev--') ? 'https://prompts.minions.help' : 'https://prompts.minions.help';
     };
 
     const getBlogUrl = () => {
         if (typeof window === 'undefined') return 'https://prompts.minions.blog';
-        return window.location.hostname.startsWith('dev--') ? 'https://dev--prompts-blog.netlify.app' : 'https://prompts.minions.blog';
+        return window.location.hostname.startsWith('dev--') ? 'https://prompts.minions.blog' : 'https://prompts.minions.blog';
     };
 
     return (

@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom';
 export default function Footer() {
     const getDocsUrl = () => {
         if (typeof window === 'undefined') return 'https://prompts.minions.help';
-        return window.location.hostname.startsWith('dev--') ? 'https://dev--prompts-docs.netlify.app' : 'https://prompts.minions.help';
+        return window.location.hostname.startsWith('dev--') ? 'https://prompts.minions.help' : 'https://prompts.minions.help';
     };
 
     const getBlogUrl = () => {
         if (typeof window === 'undefined') return 'https://prompts.minions.blog';
-        return window.location.hostname.startsWith('dev--') ? 'https://dev--prompts-blog.netlify.app' : 'https://prompts.minions.blog';
+        return window.location.hostname.startsWith('dev--') ? 'https://prompts.minions.blog' : 'https://prompts.minions.blog';
     };
     return (
         <footer className="border-t border-border bg-background py-12">

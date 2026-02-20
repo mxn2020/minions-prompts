@@ -3,7 +3,7 @@ import starlight from '@astrojs/starlight';
 
 const isProd = process.env.BRANCH === 'main';
 const isDev = process.env.BRANCH === 'dev';
-const siteUrl = isProd ? 'https://prompts.minions.help' : (isDev ? 'https://dev--prompts-docs.netlify.app' : 'http://localhost:4321');
+const siteUrl = isProd ? 'https://prompts.minions.help' : (isDev ? 'https://prompts.minions.help' : 'http://localhost:4321');
 
 export default defineConfig({
   site: siteUrl,

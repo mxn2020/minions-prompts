@@ -10,7 +10,7 @@ export const GET: APIRoute = async (context) => {
     return rss({
         title: 'Minions Blog',
         description: 'Updates, tutorials, and releases for Minions — a universal structured object system for AI agents.',
-        site: context.site || 'https://minions.wtf',
+        site: context.site || 'https://minions.blog',
         items: posts.map((post) => ({
             title: post.data.title,
             pubDate: post.data.date,

@@ -7,7 +7,7 @@ import react from '@astrojs/react';
 // https://astro.build/config
 const isProd = process.env.BRANCH === 'main';
 const isDev = process.env.BRANCH === 'dev';
-const siteUrl = isProd ? 'https://prompts.minions.blog' : (isDev ? 'https://dev--prompts-blog.netlify.app' : 'http://localhost:4321');
+const siteUrl = isProd ? 'https://prompts.minions.blog' : (isDev ? 'https://prompts.minions.blog' : 'http://localhost:4321');
 
 export default defineConfig({
     site: siteUrl,
