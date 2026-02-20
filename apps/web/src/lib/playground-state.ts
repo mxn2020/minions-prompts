@@ -9,7 +9,7 @@ export interface PlaygroundPrompt {
 }
 
 export function usePlaygroundState() {
-  const [prompts, setPrompts] = useState<PlaygroundPrompt[]>(PROMPT_EXAMPLES);
+  const [prompts, setPrompts] = useState<PlaygroundPrompt[]>(PROMPT_EXAMPLES as unknown as PlaygroundPrompt[]);
   const [selectedId, setSelectedId] = useState<string>(PROMPT_EXAMPLES[0]?.id ?? '');
   const [versions, setVersions] = useState<Record<string, PlaygroundPrompt[]>>({});
 

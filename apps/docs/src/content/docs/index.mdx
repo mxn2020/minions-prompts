@@ -36,7 +36,52 @@ Prompts degrade silently. A change that improves one use case breaks another. Wi
 - **Multi-language** — identical TypeScript and Python SDKs
 - **Export anywhere** — LangChain, LlamaIndex, raw string, or JSON
 
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
 ## Quick example
+
+Choose between the unified `MinionsPrompts` client for seamless access or the modular functions for absolute control.
+
+<Tabs>
+<TabItem label="TypeScript">
+
+### Unified Client
+```typescript
+import { MinionsPrompts, InMemoryStorage } from 'minions-prompts';
+
+const minions = new MinionsPrompts({ storage: new InMemoryStorage() });
+
+// 1. Create a prompt template
+const template = await minions.create(
+  { title: 'Summarizer', fields: { content: 'Summarize {{topic}} for {{audience}}.' } },
+  'promptTemplate'
+);
+
+// 2. Render it
+const rendered = minions.render(template.fields.content, {
+  topic: 'quantum computing',
+  audience: 'high school students',
+});
+
+// 3. Bump a version
+const v2 = await minions.create(
+  { title: 'Summarizer v2', fields: {
+    content: 'Write a engaging summary of {{topic}} for {{audience}}.',
+    versionNumber: 2,
+  }},
+  'promptVersion'
+);
+await minions.link(v2.id, template.id, 'follows');
+
+// 4. Show diff
+const diff = minions.diff(template, v2);
+console.log(minions.formatDiff(diff, true));
+
+// 5. Get version chain
+const versions = await minions.getVersionChain(template.id);
+```
+
+**OR Modular Imports**
 
 ```typescript
 import { createMinion, generateId, now } from 'minions-sdk';
@@ -84,7 +129,42 @@ const chain = new PromptChain(storage);
 const versions = await chain.getVersionChain(template.id);
 console.log(`${versions.length} versions in chain`);
 ```
+</TabItem>
+<TabItem label="Python">
 
+### Unified Client
+```python
+from minions_prompts import MinionsPrompts, InMemoryStorage
+
+minions = MinionsPrompts(storage=InMemoryStorage())
+
+# 1. Create a prompt template
+template = minions.create(
+    {"title": "Summarizer", "fields": {"content": "Summarize {{topic}} for {{audience}}."}},
+    "promptTemplate"
+)
+
+# 2. Render it
+rendered = minions.render(
+    template.fields["content"],
+    {"topic": "quantum computing", "audience": "high school students"}
+)
+
+# 3. Bump a version
+v2 = minions.create(
+    {"title": "Summarizer v2", "fields": {
+        "content": "Write an engaging summary of {{topic}} for {{audience}}.",
+        "versionNumber": 2,
+    }},
+    "promptVersion"
+)
+minions.link(v2.id, template.id, "follows")
+
+# 4. Show version chain
+versions = minions.get_version_chain(template.id)
+```
+
+**OR Modular Imports**
 ```python
 from minions import create_minion, generate_id, now, Relation
 from minions_prompts import (
@@ -114,3 +194,5 @@ chain = PromptChain(storage)
 versions = chain.get_version_chain(template.id)
 print(f"{len(versions)} version(s) in chain")
 ```
+</TabItem>
+</Tabs>

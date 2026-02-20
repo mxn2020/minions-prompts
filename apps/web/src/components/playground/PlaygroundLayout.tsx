@@ -6,6 +6,7 @@ import { VersionHistory } from './VersionHistory';
 import { DiffViewer } from './DiffViewer';
 import { TabGroup } from '../shared/TabGroup';
 import { Button } from '../shared/Button';
+import { Link } from 'react-router-dom';
 
 interface Variable {
     name: string;
@@ -72,39 +73,49 @@ export function PlaygroundLayout() {
     const prevVersion = activeVersionId ? versions[versions.findIndex(v => v.id === activeVersionId) + 1] : undefined;
 
     return (
-        <div className="flex flex-col gap-6 p-6 max-w-7xl mx-auto">
-            <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold text-primary">Prompt Playground</h1>
+        <div className="flex flex-col h-screen bg-background text-primary overflow-hidden">
+            <header className="h-14 border-b border-border flex items-center justify-between px-4 bg-surface/50">
+                <div className="flex items-center space-x-4">
+                    <Link to="/" className="text-muted hover:text-primary transition-colors text-sm">
+                        ← Back
+                    </Link>
+                    <span className="font-mono font-bold">Prompt Playground</span>
+                </div>
                 <Button onClick={saveVersion} size="sm">Save Version</Button>
-            </div>
+            </header>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 flex flex-col gap-4">
-                    <TemplateEditor value={template} onChange={handleTemplateChange} />
-                    <VariablePanel variables={variables} onChange={setVariables} />
-                </div>
-                <div className="flex flex-col gap-4">
-                    <VersionHistory versions={versions} activeId={activeVersionId} onSelect={loadVersion} />
+            <div className="flex-1 overflow-y-auto p-6">
+                <div className="max-w-7xl mx-auto flex flex-col gap-6">
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="lg:col-span-2 flex flex-col gap-4">
+                            <TemplateEditor value={template} onChange={handleTemplateChange} />
+                            <VariablePanel variables={variables} onChange={setVariables} />
+                        </div>
+                        <div className="flex flex-col gap-4">
+                            <VersionHistory versions={versions} activeId={activeVersionId} onSelect={loadVersion} />
+                        </div>
+                    </div>
+
+                    <TabGroup
+                        tabs={[
+                            {
+                                label: 'Preview',
+                                content: <RendererPreview rendered={rendered} />,
+                            },
+                            {
+                                label: 'Diff',
+                                content: (
+                                    <DiffViewer
+                                        before={prevVersion?.content ?? ''}
+                                        after={activeVersion?.content ?? template}
+                                    />
+                                ),
+                            },
+                        ]}
+                    />
                 </div>
             </div>
-
-            <TabGroup
-                tabs={[
-                    {
-                        label: 'Preview',
-                        content: <RendererPreview rendered={rendered} />,
-                    },
-                    {
-                        label: 'Diff',
-                        content: (
-                            <DiffViewer
-                                before={prevVersion?.content ?? ''}
-                                after={activeVersion?.content ?? template}
-                            />
-                        ),
-                    },
-                ]}
-            />
         </div>
     );
 }
