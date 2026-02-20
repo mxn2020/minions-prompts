@@ -1,0 +1,6 @@
+# Proxy docs under /docs
+/docs       https://prompts-docs.netlify.app/        200
+/docs/*     https://prompts-docs.netlify.app/:splat  200
+
+# SPA fallback
+/*          /index.html                             200
