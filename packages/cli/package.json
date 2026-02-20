@@ -1,6 +1,6 @@
 {
   "name": "@minions-prompts/cli",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "CLI for minions-prompts — version-controlled prompt engineering",
   "type": "module",
   "bin": {

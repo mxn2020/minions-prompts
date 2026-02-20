@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "minions-prompts"
-version = "0.1.1"
+version = "0.1.2"
 description = "Version-controlled prompt engineering system built on the Minions SDK"
 readme = "README.md"
 license = { text = "AGPL-3.0" }
