@@ -14,7 +14,7 @@ authors = [
     { name = "Mehdi Nabhani", email = "mehdi@the-mehdi.com" }
 ]
 dependencies = [
-    "minions-sdk>=0.2.0",
+    "minions-sdk>=0.2.1",
 ]
 
 [project.optional-dependencies]
