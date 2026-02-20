@@ -18,9 +18,5 @@
   "devDependencies": {
     "typescript": "^5.9.3"
   },
-  "license": "MIT",
-  "dependencies": {
-    "core": "link:minions/packages/core",
-    "minions-sdk": "link:../minions/packages/core"
-  }
+  "license": "MIT"
 }

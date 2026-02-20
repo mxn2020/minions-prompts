@@ -11,13 +11,6 @@ overrides:
 importers:
 
   .:
-    dependencies:
-      core:
-        specifier: link:minions/packages/core
-        version: link:minions/packages/core
-      minions-sdk:
-        specifier: link:../minions/packages/core
-        version: link:../minions/packages/core
     devDependencies:
       typescript:
         specifier: ^5.9.3
