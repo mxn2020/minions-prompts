@@ -15,3 +15,6 @@ coverage/
 .pytest_cache/
 PROMPT.md
 PROMPTS.md
+
+# Local Netlify folder
+.netlify

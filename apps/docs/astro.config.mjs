@@ -6,6 +6,9 @@ export default defineConfig({
     starlight({
       title: 'minions-prompts',
       description: 'GitHub for prompts — version control, testing, and A/B comparison for prompt engineering.',
+      components: {
+        Head: './src/components/CopyMarkdownButton.astro',
+      },
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/mxn2020/minions-prompts' }],
       sidebar: [
         {
