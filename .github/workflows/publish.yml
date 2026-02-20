@@ -40,13 +40,13 @@ jobs:
       - name: Test
         run: pnpm run test
 
-      - name: Publish minions-prompts
-        run: pnpm --filter minions-prompts publish --no-git-checks --access public
+      - name: Publish @minions-prompts/sdk
+        run: pnpm --filter @minions-prompts/sdk publish --no-git-checks --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish minions-prompts-cli
-        run: pnpm --filter minions-prompts-cli publish --no-git-checks --access public
+      - name: Publish @minions-prompts/cli
+        run: pnpm --filter @minions-prompts/cli publish --no-git-checks --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
