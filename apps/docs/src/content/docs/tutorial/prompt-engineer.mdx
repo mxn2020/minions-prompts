@@ -3,11 +3,16 @@ title: Prompt Engineering Tutorial
 description: End-to-end walkthrough — create a prompt template, version it, run A/B tests, compare results, and export to LangChain.
 ---
 
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
 This tutorial walks through the complete minions-prompts workflow: from writing your first template to shipping a tested, versioned prompt to a production LangChain pipeline.
 
 ## Prerequisites
 
 Install the SDK and initialise storage:
+
+<Tabs>
+<TabItem label="TypeScript">
 
 ```typescript
 import {
@@ -20,6 +25,9 @@ import { createMinion, generateId, now } from 'minions-sdk';
 const storage = new InMemoryStorage();
 ```
 
+</TabItem>
+<TabItem label="Python">
+
 ```python
 from minions import create_minion, generate_id, now, Relation
 from minions_prompts import (
@@ -31,9 +39,15 @@ from minions_prompts import (
 storage = InMemoryStorage()
 ```
 
+</TabItem>
+</Tabs>
+
 ## Step 1: Create a Prompt Template
 
 A **prompt template** is the canonical definition of a prompt. It holds the content, optional variable declarations, and metadata tags.
+
+<Tabs>
+<TabItem label="TypeScript">
 
 ```typescript
 const { minion: template } = createMinion(
@@ -62,6 +76,9 @@ await storage.saveMinion(template);
 console.log('Template ID:', template.id);
 ```
 
+</TabItem>
+<TabItem label="Python">
+
 ```python
 template, _ = create_minion(
     {
@@ -88,9 +105,15 @@ storage.save_minion(template)
 print("Template ID:", template.id)
 ```
 
+</TabItem>
+</Tabs>
+
 ## Step 2: Render and Inspect
 
 Use `PromptRenderer` to verify the template resolves correctly before creating test cases.
+
+<Tabs>
+<TabItem label="TypeScript">
 
 ```typescript
 const renderer = new PromptRenderer();
@@ -109,6 +132,9 @@ const minimal = renderer.render(template.fields.content, {
 }, { strict: false });
 ```
 
+</TabItem>
+<TabItem label="Python">
+
 ```python
 renderer = PromptRenderer()
 
@@ -119,6 +145,9 @@ preview = renderer.render(template.fields["content"], {
 })
 print(preview)
 ```
+
+</TabItem>
+</Tabs>
 
 ## Step 3: Create Test Cases
 
@@ -275,6 +304,9 @@ console.log(differ.format(diff, true)); // true = include content line diff
 
 Once v2 wins the A/B test, export it for use in your LangChain pipeline.
 
+<Tabs>
+<TabItem label="TypeScript">
+
 ```typescript
 const exporter = new PromptExporter(storage);
 
@@ -291,6 +323,9 @@ console.log(langchainExport);
 // const pt = new PromptTemplate(langchainExport);
 ```
 
+</TabItem>
+<TabItem label="Python">
+
 ```python
 exporter = PromptExporter(storage)
 
@@ -305,6 +340,9 @@ print(lc)
 # from langchain.prompts import PromptTemplate
 # pt = PromptTemplate(**lc)
 ```
+
+</TabItem>
+</Tabs>
 
 ## Step 10: Export Full JSON Archive
 

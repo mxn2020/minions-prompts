@@ -3,6 +3,8 @@ title: Integrating with LangChain & LlamaIndex
 description: How to export prompts to LangChain PromptTemplate and LlamaIndex formats.
 ---
 
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
 ## Overview
 
 `minions-prompts` maintains prompts as versioned objects, but the runtime that actually calls your LLM may be LangChain or LlamaIndex. The export methods `toLangChain()` and `toLlamaIndex()` bridge the two worlds: you keep version control and test scoring in `minions-prompts` and hand off a native framework object at call time.
@@ -11,7 +13,8 @@ description: How to export prompts to LangChain PromptTemplate and LlamaIndex fo
 
 ## LangChain export
 
-### TypeScript — `@langchain/core`
+<Tabs>
+<TabItem label="TypeScript">
 
 ```typescript
 import { createMinion } from 'minions-sdk';
@@ -53,7 +56,8 @@ const result = await chain.invoke({
 console.log(result.content);
 ```
 
-### Python — `langchain`
+</TabItem>
+<TabItem label="Python">
 
 ```python
 from minions import create_minion
@@ -91,6 +95,9 @@ result = chain.invoke({
 print(result.content)
 ```
 
+</TabItem>
+</Tabs>
+
 ### Variable mapping
 
 `minions-prompts` uses `{{doubleCurly}}` syntax internally. The LangChain exporter converts these to LangChain's `{singleCurly}` format and populates `input_variables` automatically. You do not need to declare variables manually.
@@ -113,7 +120,8 @@ const langchainPrompt = exporter.toLangChain(template, {
 
 ## LlamaIndex export
 
-### TypeScript — `llamaindex`
+<Tabs>
+<TabItem label="TypeScript">
 
 ```typescript
 import { createMinion } from 'minions-sdk';
@@ -146,7 +154,8 @@ const response = await llm.complete({ prompt: formatted });
 console.log(response.text);
 ```
 
-### Python — `llama_index`
+</TabItem>
+<TabItem label="Python">
 
 ```python
 from minions import create_minion
@@ -175,6 +184,9 @@ formatted = llama_prompt.format(query="best laptop 2024 under 1000")
 response = llm.complete(formatted)
 print(response.text)
 ```
+
+</TabItem>
+</Tabs>
 
 ---
 

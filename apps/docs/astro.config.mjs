@@ -11,15 +11,22 @@ export default defineConfig({
     starlight({
       title: 'minions-prompts',
       description: 'GitHub for prompts — version control, testing, and A/B comparison for prompt engineering.',
+      head: [
+        { tag: 'meta', attrs: { property: 'og:image', content: '/og-image.png' } },
+      ],
       components: {
         Head: './src/components/CopyMarkdownButton.astro',
       },
-      social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/mxn2020/minions-prompts' }],
+      social: [
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/mxn2020/minions-prompts' },
+        { icon: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/in/mnx/' },
+        { icon: 'external', label: 'App', href: 'https://www.minions.wtf' },
+      ],
       sidebar: [
         {
           label: 'Getting Started',
           items: [
-            { label: 'Introduction', link: '/' },
+            { label: 'Introduction', link: '/getting-started/introduction/' },
             { label: 'Installation', link: '/getting-started/installation/' },
             { label: 'Quick Start', link: '/getting-started/quick-start/' },
           ],
@@ -67,10 +74,6 @@ export default defineConfig({
             { label: 'TypeScript', link: '/api/typescript/' },
             { label: 'Python', link: '/api/python/' },
           ],
-        },
-        {
-          label: 'CLI Reference',
-          link: '/cli/',
         },
       ],
     }),

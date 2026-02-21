@@ -14,6 +14,19 @@ hero:
       icon: external
 ---
 
+import { Card, CardGrid, LinkCard, Tabs, TabItem } from '@astrojs/starlight/components';
+
+## Start Here
+
+<CardGrid>
+  <LinkCard title="Introduction" description="What is minions-prompts and who is it for?" href="/getting-started/introduction/" />
+  <LinkCard title="Quick Start" description="Create your first versioned prompt in 5 minutes." href="/getting-started/quick-start/" />
+  <LinkCard title="A/B Testing" description="Compare prompt variations systematically." href="/guides/ab-testing/" />
+  <LinkCard title="API Reference" description="Full TypeScript and Python SDK reference." href="/api/typescript/" />
+</CardGrid>
+
+---
+
 ## What is minions-prompts?
 
 `minions-prompts` is a structured prompt engineering system that gives every prompt a full version history, a test suite, and measurable quality scores. Think of it as Git for your AI prompts.
@@ -36,7 +49,7 @@ Prompts degrade silently. A change that improves one use case breaks another. Wi
 - **Multi-language** — identical TypeScript and Python SDKs
 - **Export anywhere** — LangChain, LlamaIndex, raw string, or JSON
 
-import { Tabs, TabItem } from '@astrojs/starlight/components';
+
 
 ## Quick example
 

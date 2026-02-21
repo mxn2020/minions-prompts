@@ -1,0 +1,51 @@
+---
+title: Introduction
+description: What is minions-prompts? Version control, testing, and A/B comparison for prompt engineering.
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## What is minions-prompts?
+
+**minions-prompts** is a structured prompt engineering system built on the [Minions SDK](https://github.com/mxn2020/minions). It gives every prompt a full version history, a test suite, and measurable quality scores.
+
+Think of it as **Git for your AI prompts** — every change is tracked, every version is comparable, and regressions are caught before they reach production.
+
+## Who is it for?
+
+- **Prompt engineers** who want version control without spreadsheets or ad-hoc naming conventions
+- **AI teams** running systematic A/B tests across prompt variations
+- **Developers** integrating prompts into CI/CD pipelines with automated testing
+- **Agents** that self-improve by versioning their own system prompts
+
+## Key Features
+
+<CardGrid>
+  <Card title="Version History" icon="pencil">
+    Every prompt change creates a new version linked via `follows` relations. Roll back, compare, or branch at any point.
+  </Card>
+  <Card title="Variable Interpolation" icon="add-document">
+    `{{variable}}`, `{{#if condition}}`, `{{#each items}}` — Handlebars-style templates with type safety.
+  </Card>
+  <Card title="Test-Driven Development" icon="approve-check">
+    Write test cases before changing prompts. Run them against old and new versions to catch regressions.
+  </Card>
+  <Card title="A/B Comparison" icon="setting">
+    Run two versions against the same test suite and compare scores side by side.
+  </Card>
+</CardGrid>
+
+## How It Works
+
+1. **Create** a prompt template with typed variables
+2. **Version** it by creating linked variations via `follows` relations
+3. **Test** each version against a shared test suite
+4. **Compare** scores to pick the winner
+5. **Export** to LangChain, LlamaIndex, or raw strings
+
+## Next Steps
+
+- **[Installation](/getting-started/installation/)** — Set up in under 5 minutes
+- **[Quick Start](/getting-started/quick-start/)** — Create your first versioned prompt
+- **[Prompt Engineering Workflow](/tutorial/prompt-engineer/)** — Full tutorial
+- **[A/B Testing Prompts](/guides/ab-testing/)** — Compare prompt variations systematically
