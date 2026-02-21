@@ -7,7 +7,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 ## 1. Create a prompt template
 
-<Tabs>
+<Tabs syncKey="lang">
 <TabItem label="TypeScript">
 ```typescript
 import { createMinion } from 'minions-sdk';
@@ -54,7 +54,7 @@ print("Created:", template.id)
 
 ## 2. Render it with variables
 
-<Tabs>
+<Tabs syncKey="lang">
 <TabItem label="TypeScript">
 ```typescript
 import { PromptRenderer } from 'minions-prompts';
@@ -91,7 +91,7 @@ print(rendered)
 
 ## 3. Create a new version
 
-<Tabs>
+<Tabs syncKey="lang">
 <TabItem label="TypeScript">
 ```typescript
 import { createMinion, generateId, now } from 'minions-sdk';
@@ -150,7 +150,7 @@ storage.save_relation(Relation(
 
 ## 4. View history and diff
 
-<Tabs>
+<Tabs syncKey="lang">
 <TabItem label="TypeScript">
 ```typescript
 import { PromptChain, PromptDiff } from 'minions-prompts';

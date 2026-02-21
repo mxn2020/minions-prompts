@@ -11,6 +11,14 @@ export default defineConfig({
     starlight({
       title: 'minions-prompts',
       description: 'GitHub for prompts — version control, testing, and A/B comparison for prompt engineering.',
+      defaultLocale: 'root',
+      locales: {
+        root: { label: 'English', lang: 'en' },
+        de: { label: 'Deutsch', lang: 'de' },
+        es: { label: 'Español', lang: 'es' },
+        it: { label: 'Italiano', lang: 'it' },
+        fr: { label: 'Français', lang: 'fr' },
+      },
       head: [
         { tag: 'meta', attrs: { property: 'og:image', content: '/og-image.png' } },
       ],

@@ -16,7 +16,7 @@ description: Export your versioned prompts to popular framework formats.
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-<Tabs>
+<Tabs syncKey="lang">
 <TabItem label="TypeScript">
 ```typescript
 import { PromptExporter } from 'minions-prompts';
@@ -53,7 +53,7 @@ langchain_export = exporter.to_lang_chain(prompt_id)
 
 ## LlamaIndex Export
 
-<Tabs>
+<Tabs syncKey="lang">
 <TabItem label="TypeScript">
 ```typescript
 const llamaindex = await exporter.toLlamaIndex(promptId);

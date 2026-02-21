@@ -11,7 +11,7 @@ This tutorial walks through the complete minions-prompts workflow: from writing 
 
 Install the SDK and initialise storage:
 
-<Tabs>
+<Tabs syncKey="lang">
 <TabItem label="TypeScript">
 
 ```typescript
@@ -46,7 +46,7 @@ storage = InMemoryStorage()
 
 A **prompt template** is the canonical definition of a prompt. It holds the content, optional variable declarations, and metadata tags.
 
-<Tabs>
+<Tabs syncKey="lang">
 <TabItem label="TypeScript">
 
 ```typescript
@@ -112,7 +112,7 @@ print("Template ID:", template.id)
 
 Use `PromptRenderer` to verify the template resolves correctly before creating test cases.
 
-<Tabs>
+<Tabs syncKey="lang">
 <TabItem label="TypeScript">
 
 ```typescript
@@ -304,7 +304,7 @@ console.log(differ.format(diff, true)); // true = include content line diff
 
 Once v2 wins the A/B test, export it for use in your LangChain pipeline.
 
-<Tabs>
+<Tabs syncKey="lang">
 <TabItem label="TypeScript">
 
 ```typescript

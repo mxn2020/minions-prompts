@@ -52,7 +52,7 @@ Here are the team members:
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-<Tabs>
+<Tabs syncKey="lang">
 <TabItem label="TypeScript">
 ```typescript
 import { PromptRenderer } from 'minions-prompts';
@@ -85,7 +85,7 @@ result = renderer.render(
 
 Mark variables as required to get clear errors when they are missing:
 
-<Tabs>
+<Tabs syncKey="lang">
 <TabItem label="TypeScript">
 ```typescript
 renderer.render(template, variables, {

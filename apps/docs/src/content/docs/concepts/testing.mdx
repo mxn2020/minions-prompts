@@ -22,7 +22,7 @@ A `prompt-test` minion defines:
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-<Tabs>
+<Tabs syncKey="lang">
 <TabItem label="TypeScript">
 ```typescript
 import { createMinion } from 'minions-sdk';
@@ -71,7 +71,7 @@ storage.save_minion(test)
 
 ## Running a Test
 
-<Tabs>
+<Tabs syncKey="lang">
 <TabItem label="TypeScript">
 ```typescript
 import { PromptScorer } from 'minions-prompts';
