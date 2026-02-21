@@ -113,18 +113,16 @@ const comparison = await compareVersions({
 For tasks where substring matching is too coarse — such as tone, factual accuracy, or instruction following — provide a custom `evaluator` function:
 
 ```typescript
-import { runTest } from 'minions-prompts';
+import { PromptScorer } from '@minions-prompts/sdk';
 
-const result = await runTest({
-  prompt: template,
-  testCase,
-  llm: async (prompt) => callOpenAI(prompt),
-  evaluator: async ({ response, testCase }) => {
-    // Call an LLM judge or your own scoring logic
-    const judgeScore = await judgeResponseQuality(response, testCase.expectedOutput);
-    // Return a number between 0 and testCase.maxScore
-    return judgeScore * testCase.maxScore;
-  },
+const scorer = new PromptScorer(storage);
+
+// Call your LLM externally, then pass the evaluation to the scorer
+const llmResponse = await callYourLLM(renderedPrompt);
+const result = await scorer.runTest(prompt.id, testCase.id, {
+  scores: { relevance: 85, coherence: 90 },
+  passed: true,
+  output: llmResponse,
 });
 ```
 

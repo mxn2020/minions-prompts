@@ -19,7 +19,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 <Tabs syncKey="lang">
 <TabItem label="TypeScript">
 ```typescript
-import { PromptExporter } from 'minions-prompts';
+import { PromptExporter } from '@minions-prompts/sdk';
 
 const exporter = new PromptExporter(storage);
 const langchain = await exporter.toLangChain(promptId);

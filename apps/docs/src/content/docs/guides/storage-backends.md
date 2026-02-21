@@ -39,7 +39,7 @@ Suitable for single-process servers or local tooling that needs persistence acro
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import type { Minion, Relation } from 'minions-sdk';
-import type { PromptStorage } from 'minions-prompts';
+import type { PromptStorage } from '@minions-prompts/sdk';
 
 interface FileData {
   minions: Record<string, Minion>;
@@ -99,7 +99,7 @@ export class FileStorage implements PromptStorage {
 
 ```typescript
 import { FileStorage } from './file-storage';
-import { PromptChain } from 'minions-prompts';
+import { PromptChain } from '@minions-prompts/sdk';
 
 const storage = new FileStorage('./data/prompts.json');
 const chain = new PromptChain(storage);
@@ -114,7 +114,7 @@ Good for horizontally scaled services that need a shared prompt store.
 ```typescript
 import { createClient, RedisClientType } from 'redis';
 import type { Minion, Relation } from 'minions-sdk';
-import type { PromptStorage } from 'minions-prompts';
+import type { PromptStorage } from '@minions-prompts/sdk';
 
 export class RedisStorage implements PromptStorage {
   constructor(private client: RedisClientType) {}
@@ -185,7 +185,7 @@ Wrap any backend in a read-through cache to reduce latency for frequently read t
 ```typescript
 import { LRUCache } from 'lru-cache';
 import type { Minion, Relation } from 'minions-sdk';
-import type { PromptStorage } from 'minions-prompts';
+import type { PromptStorage } from '@minions-prompts/sdk';
 
 export class CachedStorage implements PromptStorage {
   private cache = new LRUCache<string, Minion>({ max: 500, ttl: 60_000 });

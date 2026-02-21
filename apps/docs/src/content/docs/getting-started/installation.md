@@ -6,9 +6,9 @@ description: Install minions-prompts for TypeScript/Node.js or Python.
 ## TypeScript / Node.js
 
 ```bash
-npm install minions-prompts minions-sdk
+npm install @minions-prompts/sdk minions-sdk
 # or
-pnpm add minions-prompts minions-sdk
+pnpm add @minions-prompts/sdk minions-sdk
 ```
 
 ## Python

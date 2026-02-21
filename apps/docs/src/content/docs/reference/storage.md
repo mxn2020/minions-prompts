@@ -47,7 +47,7 @@ Persists a relation. Relation IDs are caller-generated. If a relation with the s
 `InMemoryStorage` is the built-in reference implementation backed by two `Map` objects — one for minions and one for relations. It is synchronous internally but exposes the same `Promise`-based interface as any production backend.
 
 ```typescript
-import { InMemoryStorage } from 'minions-prompts';
+import { InMemoryStorage } from '@minions-prompts/sdk';
 
 const storage = new InMemoryStorage();
 ```
@@ -76,7 +76,7 @@ Any class that satisfies the four-method contract is a valid storage backend. Th
 ```typescript
 import { Pool } from 'pg';
 import type { Minion, Relation } from 'minions-sdk';
-import type { PromptStorage } from 'minions-prompts';
+import type { PromptStorage } from '@minions-prompts/sdk';
 
 export class PostgresStorage implements PromptStorage {
   constructor(private pool: Pool) {}
@@ -120,7 +120,7 @@ export class PostgresStorage implements PromptStorage {
 
 ```typescript
 import { Pool } from 'pg';
-import { PromptChain } from 'minions-prompts';
+import { PromptChain } from '@minions-prompts/sdk';
 import { PostgresStorage } from './postgres-storage';
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });

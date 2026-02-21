@@ -91,7 +91,7 @@ import Default from '@astrojs/starlight/components/Head.astro';
 
   async function fetchMarkdownSource(): Promise<string> {
     const path = window.location.pathname.replace(/\/$/, '') || '';
-    const base = 'https://raw.githubusercontent.com/mxn2020/minions/main/apps/docs/src/content/docs';
+    const base = 'https://raw.githubusercontent.com/mxn2020/minions-prompts/main/apps/docs/src/content/docs';
     
     // Try these paths in order:
     // 1. /path.mdx      (top-level page)

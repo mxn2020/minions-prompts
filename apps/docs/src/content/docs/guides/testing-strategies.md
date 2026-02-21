@@ -13,14 +13,14 @@ Prompts degrade silently. A wording change that improves precision for one use c
 
 ## Anatomy of a test case
 
-A test case is a minion of type `promptTestCaseType`. It associates an input variable set with an expected output pattern and an optional scoring rubric.
+A test case is a minion of type `promptTestType`. It associates an input variable set with an expected output pattern and an optional scoring rubric.
 
 ```typescript
 import { createMinion, generateId, now } from 'minions-sdk';
 import {
-  promptTestCaseType,
+  promptTestType,
   InMemoryStorage,
-} from 'minions-prompts';
+} from '@minions-prompts/sdk';
 
 const storage = new InMemoryStorage();
 
@@ -35,7 +35,7 @@ const { minion: testCase } = createMinion(
       maxScore: 1,
     },
   },
-  promptTestCaseType,
+  promptTestType,
 );
 await storage.saveMinion(testCase);
 ```
@@ -106,64 +106,60 @@ If the new version scores higher on all important test cases, promote it. If it 
 
 ## Running test suites in code
 
-### `runTest` — single test case
+### `scorer.runTest()` — single test case
 
 ```typescript
-import { runTest } from 'minions-prompts';
+import { PromptScorer } from '@minions-prompts/sdk';
 
-const result = await runTest({
-  prompt: template,
-  testCase,
-  llm: async (prompt) => {
-    // your LLM call here — return the response string
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [{ role: 'user', content: prompt }],
-    });
-    return response.choices[0].message.content ?? '';
-  },
+const scorer = new PromptScorer(storage);
+
+// Call your LLM first, then record the evaluation
+const llmResponse = await openai.chat.completions.create({
+  model: 'gpt-4o-mini',
+  messages: [{ role: 'user', content: renderedPrompt }],
+});
+const responseText = llmResponse.choices[0].message.content ?? '';
+
+const result = await scorer.runTest(template.id, testCase.id, {
+  scores: { accuracy: 1 },
+  passed: true,
+  output: responseText,
 });
 
-console.log(result.score);    // 0 or 1 for binary, or fractional
-console.log(result.passed);   // boolean
-console.log(result.response); // raw LLM response string
+console.log(result.scores);       // { accuracy: 1 }
+console.log(result.passed);       // boolean
+console.log(result.renderedPrompt); // the rendered prompt string
 ```
 
-### `runTestSuite` — all cases for a template
+### `scorer.runTestSuite()` — all cases for a prompt
 
 ```typescript
-import { runTestSuite } from 'minions-prompts';
+const results = await scorer.runTestSuite(
+  template.id,
+  testIds,
+  evaluations, // array of { scores, passed } in the same order as testIds
+);
 
-const suite = await runTestSuite({
-  promptId: template.id,
-  storage,
-  llm: async (prompt) => { /* ... */ },
-});
-
-console.log(suite.averageScore);    // 0.0 – 1.0
-console.log(suite.passedCount);     // number of cases that passed
-console.log(suite.totalCount);      // total test cases
-suite.results.forEach((r) => {
-  console.log(r.testCaseId, r.score, r.passed);
+results.forEach((r) => {
+  console.log(r.testId, r.scores, r.passed);
 });
 ```
 
-### `compareVersions` — A/B comparison
+### `scorer.compareVersions()` — A/B comparison
 
 ```typescript
-import { compareVersions } from 'minions-prompts';
+const comparisons = await scorer.compareVersions(
+  templateV1.id,
+  templateV2.id,
+  testIds,
+  v1Evaluations, // array of { scores, passed } for v1
+  v2Evaluations, // array of { scores, passed } for v2
+);
 
-const comparison = await compareVersions({
-  promptIdA: templateV1.id,
-  promptIdB: templateV2.id,
-  storage,
-  llm: async (prompt) => { /* ... */ },
+comparisons.forEach((c) => {
+  console.log(c.testId, c.winner);  // 'v1', 'v2', or 'tie'
+  console.log(c.deltas);            // per-dimension score differences
 });
-
-console.log(comparison.winner);           // 'A', 'B', or 'tie'
-console.log(comparison.scoreDelta);       // B.averageScore - A.averageScore
-console.log(comparison.suiteA.averageScore);
-console.log(comparison.suiteB.averageScore);
 ```
 
 ---

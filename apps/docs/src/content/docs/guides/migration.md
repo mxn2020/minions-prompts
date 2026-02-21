@@ -21,10 +21,10 @@ Check the [CHANGELOG](https://github.com/mxn2020/minions-prompts/blob/main/CHANG
 
 ```bash
 # Upgrade to the latest version
-npm install minions-prompts@latest
+npm install @minions-prompts/sdk@latest
 
 # Upgrade to a specific version
-npm install minions-prompts@2.0.0
+npm install @minions-prompts/sdk@2.0.0
 ```
 
 Check peer dependencies after upgrading:
@@ -83,12 +83,12 @@ The standalone `createPromptVersion` utility function was removed in favor of us
 
 ```typescript
 // Before (1.x)
-import { createPromptVersion } from 'minions-prompts';
+import { createPromptVersion } from '@minions-prompts/sdk';
 const version = createPromptVersion({ content: '...', changelog: '...' }, templateId);
 
 // After (2.x)
 import { createMinion, generateId, now } from 'minions-sdk';
-import { promptVersionType } from 'minions-prompts';
+import { promptVersionType } from '@minions-prompts/sdk';
 const { minion: version } = createMinion(
   { title: 'My prompt v2', fields: { content: '...', changelog: '...', versionNumber: 2 } },
   promptVersionType,

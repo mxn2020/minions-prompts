@@ -6,7 +6,7 @@ description: Complete API reference for the minions-prompts TypeScript library.
 ## Installation
 
 ```bash
-npm install minions-prompts minions-sdk
+npm install @minions-prompts/sdk minions-sdk
 ```
 
 ## PromptChain
@@ -119,7 +119,7 @@ import {
   promptVariableType,   // MinionType for variable definitions
   promptTestType,       // MinionType for test cases
   promptResultType,     // MinionType for test results
-} from 'minions-prompts';
+} from '@minions-prompts/sdk';
 ```
 
 ## Types
