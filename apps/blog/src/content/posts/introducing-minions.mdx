@@ -1,78 +1,98 @@
 ---
-title: "Introducing Minions Prompts: Version Control for Prompt Engineering"
-description: "Why we built Minions Prompts — bringing version control, testing, and A/B comparison to the world of prompt engineering."
+title: "Introducing Minions Prompts: GitHub for Your Prompts"
+description: "Why prompt engineering needs version control, testing, and A/B comparison — and how Minions Prompts delivers all three."
 date: 2026-02-20
 author: "Mehdi Nabhani"
-tags: ["announcement", "architecture", "prompts"]
+tags: ["announcement", "prompts", "versioning"]
 draft: false
 ---
 
-# The Missing Tool for Prompt Engineering
+# Version Control for Prompt Engineering
 
-Prompt engineering has become one of the most critical skills in AI development, yet the tooling around it remains surprisingly primitive. Most teams manage prompts in spreadsheets, Notion docs, or scattered text files — with no version history, no testing framework, and no way to systematically compare prompt variations.
+Prompt engineering is the new programming — but unlike traditional code, prompts live in spreadsheets, sticky notes, and Slack threads. There's no `git diff`, no test suite, no way to know which version of a prompt works best in production.
 
-**Minions Prompts** brings the discipline of software engineering to prompt management.
+**Minions Prompts** fixes that.
 
 <Callout type="info">
-Think of Minions Prompts as "GitHub for prompts" — version control, branching, testing, and A/B comparison for your prompt engineering workflow.
+Minions Prompts is an open-source system built on the Minions SDK that brings version control, testing, and A/B comparison to prompt engineering workflows.
 </Callout>
 
-## The Problem
+## The Prompt Engineering Problem
 
-When you're iterating on a prompt, you need to:
+Every team working with LLMs runs into the same issues:
 
-- **Track changes** — What did the prompt look like last week? What did I change?
-- **Test systematically** — Does this prompt still handle edge cases after my edit?
-- **Compare versions** — Is version 3 actually better than version 2?
-- **Collaborate safely** — How do I let a teammate experiment without breaking production prompts?
+1. **Version chaos** — "Which version of the summarization prompt are we using?"
+2. **No testing** — Prompt changes go live without systematic validation
+3. **Gut-feel tuning** — A/B comparisons happen informally, if at all
+4. **No rollback** — When a prompt regresses, there's no easy way to revert
 
-Most teams solve this with copy-paste and naming conventions like `prompt_v3_final_FINAL.txt`. We can do better.
+## How Minions Prompts Helps
 
-## How Minions Prompts Works
+### Template Versioning
 
-### Templates & Variables
-
-Prompts are stored as templates with typed variables that are interpolated at runtime:
+Every prompt is a versioned template with variable interpolation.
 
 ```typescript
-import { PromptTemplate } from '@minions-prompts/sdk';
+import { createMinionsPrompts } from '@minions-prompts/sdk';
 
-const template = new PromptTemplate({
-  name: 'customer-support',
-  content: 'You are a {{role}} helping a customer with {{issue}}. Respond in {{tone}} tone.',
-  variables: {
-    role: { type: 'string', default: 'support agent' },
-    issue: { type: 'string', required: true },
-    tone: { type: 'enum', values: ['professional', 'friendly', 'concise'] },
-  },
+const client = createMinionsPrompts();
+
+// Create a prompt template
+const template = await client.templates.create({
+  name: 'summarizer',
+  content: 'Summarize the following {{format}}: {{text}}',
+  variables: ['format', 'text'],
+  tags: ['summarization', 'production']
+});
+
+// Create a new version
+const v2 = await client.templates.createVersion(template.id, {
+  content: 'You are a precise summarizer. Summarize the following {{format}} in {{maxWords}} words or fewer: {{text}}',
+  variables: ['format', 'text', 'maxWords'],
+  changelog: 'Added word limit constraint'
 });
 ```
 
-### Version Chains
-
-Every edit creates a new version linked to the previous one. You can traverse the full history, diff any two versions, and roll back to any point.
-
 ### Test-Driven Prompt Development
 
-Write test cases for your prompts, just like you'd write unit tests for code:
+Write test cases for your prompts just like you write unit tests for code.
 
 ```typescript
-const testCase = {
-  input: { issue: 'billing error', tone: 'professional' },
-  assertions: [
-    { type: 'contains', value: 'billing' },
-    { type: 'max_tokens', value: 200 },
-    { type: 'sentiment', value: 'positive' },
-  ],
-};
+const testSuite = await client.tests.create({
+  templateId: template.id,
+  cases: [
+    {
+      input: { format: 'article', text: 'Long article content...' },
+      assertions: [
+        { type: 'maxLength', value: 200 },
+        { type: 'contains', value: 'key finding' }
+      ]
+    }
+  ]
+});
+```
+
+### A/B Comparison
+
+Compare prompt versions head-to-head with real inputs and automated scoring.
+
+```typescript
+const comparison = await client.compare({
+  templateId: template.id,
+  versionA: 'v1',
+  versionB: 'v2',
+  testCases: testSuite.cases
+});
+
+console.log(`v1 score: ${comparison.scoreA}`);
+console.log(`v2 score: ${comparison.scoreB}`);
+console.log(`Winner: ${comparison.winner}`);
 ```
 
 <Callout type="tip">
-Test-driven prompt development catches regressions early. When you change a template, re-run your test suite to make sure all edge cases still pass.
+Start with simple assertions (length, keyword presence) and gradually add more sophisticated scoring as your testing practice matures.
 </Callout>
 
 ## What's Next?
 
-The `@minions-prompts/sdk` is available on NPM, along with a CLI tool and a web-based playground. We're actively developing the Python SDK and adding integrations with LangChain and LlamaIndex.
-
-Start version-controlling your prompts today!
+We're building the CLI, expanding the Python SDK, and developing a full web playground. Check out the [documentation](https://prompts.minions.help) and join us on [GitHub](https://github.com/mxn2020/minions-prompts)!

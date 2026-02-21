@@ -9,7 +9,7 @@ export default defineConfig({
   site: siteUrl,
   integrations: [
     starlight({
-      title: 'minions-prompts',
+      title: 'Minions Prompts',
       description: 'GitHub for prompts — version control, testing, and A/B comparison for prompt engineering.',
       defaultLocale: 'root',
       locales: {
@@ -37,6 +37,7 @@ export default defineConfig({
             { label: 'Introduction', link: '/getting-started/introduction/' },
             { label: 'Installation', link: '/getting-started/installation/' },
             { label: 'Quick Start', link: '/getting-started/quick-start/' },
+            { label: 'Contributing', link: '/guides/contributing/' },
           ],
         },
         {

@@ -1,118 +1,177 @@
 ---
-title: "Building a Prompt Playground with the Minions Prompts SDK"
-description: "A hands-on guide to building an interactive prompt playground using the @minions-prompts/sdk — render, test, and diff prompt versions in real time."
-date: 2026-02-20
+title: "Building with the Prompts SDK: A Technical Tutorial"
+description: "Learn how to create prompt templates, manage versions, write tests, and run A/B comparisons with @minions-prompts/sdk."
+date: 2026-02-21
 author: "Mehdi Nabhani"
-tags: ["tutorial", "sdk", "playground"]
+tags: ["tutorial", "typescript", "sdk"]
 draft: false
 ---
 
-# Building a Prompt Playground
+# Getting Started with the Prompts SDK
 
-One of the best ways to iterate on prompts is to see them render in real time as you edit. In this tutorial, we'll walk through building an interactive prompt playground using the Minions Prompts SDK.
+In our previous post, we introduced why prompt engineering needs proper version control. Today, we're diving into the code. The `@minions-prompts/sdk` gives you a type-safe, structured approach to managing prompts at scale.
 
-## Prerequisites
-
-- Node.js 20+
-- The `@minions-prompts/sdk` package
+## Installation
 
 ```bash
-npm install @minions-prompts/sdk
+pnpm add @minions-prompts/sdk
 ```
 
-## Creating a Template
+<Callout type="warning">
+The SDK requires `minions-sdk` as a peer dependency. Make sure it's installed in your project.
+</Callout>
 
-Start by defining a prompt template with variables:
+## Creating Prompt Templates
+
+Templates are the core unit in Minions Prompts. They define a prompt's structure, variables, and metadata.
 
 ```typescript
-import { PromptTemplate } from '@minions-prompts/sdk';
+import { createMinionsPrompts } from '@minions-prompts/sdk';
 
-const template = new PromptTemplate({
-  name: 'summarizer',
-  content: `Summarize the following {{content_type}} in {{word_count}} words or fewer.
-Focus on: {{focus_areas}}.
-Audience: {{audience}}.
+const client = createMinionsPrompts();
 
-Content:
-{{content}}`,
-  variables: {
-    content_type: { type: 'string', default: 'article' },
-    word_count: { type: 'number', default: 100 },
-    focus_areas: { type: 'string', default: 'key takeaways' },
-    audience: { type: 'string', default: 'general' },
-    content: { type: 'string', required: true },
-  },
+// Create a template with variable interpolation
+const template = await client.templates.create({
+  name: 'code-reviewer',
+  content: `Review the following {{language}} code for {{criteria}}:
+
+\`\`\`{{language}}
+{{code}}
+\`\`\`
+
+Provide specific, actionable feedback.`,
+  variables: ['language', 'code', 'criteria'],
+  tags: ['code-review', 'development']
 });
 ```
 
-## Rendering with Variables
+## Variable Interpolation
 
-The SDK handles variable interpolation and validation:
+The rendering engine handles variable substitution with type safety.
 
 ```typescript
-const rendered = template.render({
-  content_type: 'research paper',
-  word_count: 150,
-  focus_areas: 'methodology and findings',
-  audience: 'PhD researchers',
-  content: '...',
+import { PromptRenderer } from '@minions-prompts/sdk';
+
+const renderer = new PromptRenderer();
+
+const rendered = renderer.render(template, {
+  language: 'TypeScript',
+  code: 'const x: any = "hello";',
+  criteria: 'type safety and best practices'
 });
 
 console.log(rendered);
-// "Summarize the following research paper in 150 words or fewer..."
+// Review the following TypeScript code for type safety and best practices:
+// ```TypeScript
+// const x: any = "hello";
+// ```
+// Provide specific, actionable feedback.
 ```
 
-<Callout type="info">
-The SDK validates all variables at render time. Missing required variables throw descriptive errors, and type mismatches are caught before the prompt reaches your LLM.
-</Callout>
+## Version Chains
 
-## Version History
-
-Every time you save a template, a new version is created. You can traverse the history and diff any two versions:
+As you iterate on prompts, each version forms a chain — making it easy to track evolution and roll back.
 
 ```typescript
-// Create a new version
-const v2 = template.fork({
-  content: `Summarize the following {{content_type}} in exactly {{word_count}} words.
-Be precise and factual. Audience: {{audience}}.
+// Original version (v1)
+const v1 = template;
 
-Content:
-{{content}}`,
+// Create v2 with more specific instructions
+const v2 = await client.templates.createVersion(template.id, {
+  content: `You are a senior {{language}} developer. Review the code below for {{criteria}}.
+Rate each issue as LOW, MEDIUM, or HIGH severity.
+
+\`\`\`{{language}}
+{{code}}
+\`\`\``,
+  changelog: 'Added severity ratings and senior developer persona'
 });
 
-// Diff the two versions
-const diff = template.diff(v2);
-console.log(`${diff.additions} lines added, ${diff.deletions} lines removed`);
+// View version history
+const history = await client.templates.getVersionChain(template.id);
+console.log(`${history.length} versions of "${template.name}"`);
 ```
 
-## Running Tests
+## Writing Test Cases
 
-Write test cases to validate that your prompt produces the expected results:
+Prompts should be tested like code. Define expected behaviors and validate them.
 
 ```typescript
-const results = await template.runTests([
-  {
-    variables: { content: 'Sample text...', word_count: 50 },
-    assertions: [
-      { type: 'max_tokens', value: 75 },
-      { type: 'no_hallucination', reference: 'Sample text...' },
-    ],
-  },
-]);
-
-console.log(`${results.passed}/${results.total} tests passed`);
+const tests = await client.tests.create({
+  templateId: template.id,
+  cases: [
+    {
+      name: 'catches-any-type',
+      input: {
+        language: 'TypeScript',
+        code: 'const x: any = "hello";',
+        criteria: 'type safety'
+      },
+      assertions: [
+        { type: 'contains', value: 'any' },
+        { type: 'minLength', value: 50 }
+      ]
+    },
+    {
+      name: 'handles-python',
+      input: {
+        language: 'Python',
+        code: 'def foo(x): return x + 1',
+        criteria: 'type hints'
+      },
+      assertions: [
+        { type: 'contains', value: 'type' }
+      ]
+    }
+  ]
+});
 ```
 
 <Callout type="tip">
-Integrate `template.runTests()` into your CI pipeline to catch prompt regressions before they reach production.
+Start with simple structural assertions. As you build confidence, add LLM-judged evaluation criteria for semantic checking.
 </Callout>
 
-## What You Can Build From Here
+## Scoring and A/B Testing
 
-This basic playground can be extended with:
+Compare versions quantitatively to make data-driven prompt decisions.
 
-- **Side-by-side diff viewer** — Compare two prompt versions visually
-- **A/B test launcher** — Run the same input through two template versions and compare outputs
-- **Scoring dashboard** — Track prompt quality scores over time
+```typescript
+import { PromptScorer } from '@minions-prompts/sdk';
 
-Check out the full playground implementation in the [web app source code](https://github.com/mxn2020/minions-prompts) and the [SDK documentation](https://prompts.minions.help).
+const scorer = new PromptScorer();
+
+const results = await scorer.compare({
+  templateId: template.id,
+  versionA: v1.version,
+  versionB: v2.version,
+  testCases: tests.cases,
+  metrics: ['accuracy', 'specificity', 'length']
+});
+
+console.log(`v1: ${results.scoreA.toFixed(2)} | v2: ${results.scoreB.toFixed(2)}`);
+console.log(`Recommendation: ${results.recommendation}`);
+```
+
+## Using the CLI
+
+For quick prompt management, use the CLI.
+
+```bash
+# Create a new template
+prompts create --name summarizer --file ./prompts/summarizer.txt
+
+# List all templates
+prompts list
+
+# Create a new version
+prompts version create --template summarizer --file ./prompts/summarizer-v2.txt
+
+# Run tests
+prompts test run --template summarizer
+```
+
+## Conclusion
+
+The Prompts SDK gives you the same rigor for prompt engineering that you expect from software engineering — version control, testing, and data-driven iteration.
+
+Check out the [full documentation](https://prompts.minions.help) for advanced topics like exporting to LangChain and agent self-improvement!

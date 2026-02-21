@@ -24,12 +24,12 @@
     "docs": "typedoc"
   },
   "dependencies": {
-    "minions-sdk": "0.2.2"
+    "minions-sdk": "^0.2.3"
   },
   "devDependencies": {
     "@types/node": "^25.3.0",
-    "typedoc": "^0.26.0",
-    "typedoc-plugin-markdown": "^4.0.0",
+    "typedoc": "^0.28.17",
+    "typedoc-plugin-markdown": "^4.10.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   },
@@ -44,5 +44,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/mxn2020/minions-prompts"
-  }
+  },
+  "homepage": "https://prompts.minions.help"
 }

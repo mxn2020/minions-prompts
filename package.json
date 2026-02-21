@@ -16,7 +16,8 @@
     "deploy:docs": "pnpm --filter minions-prompts-docs run build && netlify deploy --dir apps/docs/dist --prod",
     "deploy:web": "pnpm --filter minions-prompts-web run build && netlify deploy --dir apps/web/dist --prod",
     "test": "pnpm --filter @minions-prompts/sdk run test",
-    "lint": "pnpm --filter @minions-prompts/sdk run build && pnpm --filter @minions-prompts/sdk run lint && pnpm --filter @minions-prompts/cli run lint"
+    "lint": "pnpm --filter @minions-prompts/sdk run build && pnpm --filter @minions-prompts/sdk run lint && pnpm --filter @minions-prompts/cli run lint",
+    "deploy": "pnpm run deploy:blog"
   },
   "engines": {
     "node": ">=20"

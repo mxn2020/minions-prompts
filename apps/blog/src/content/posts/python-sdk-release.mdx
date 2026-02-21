@@ -1,18 +1,20 @@
 ---
-title: "Minions Prompts Python SDK: Prompt Engineering in Python"
-description: "Announcing the Python SDK for Minions Prompts — version-control, test, and A/B compare prompts directly from your Python scripts and notebooks."
-date: 2026-02-20
+title: "Python SDK Release: Prompt Engineering in Python"
+description: "The Minions Prompts Python SDK brings version-controlled prompt engineering to Python — with Pydantic models and async support."
+date: 2026-02-22
 author: "Mehdi Nabhani"
-tags: ["python", "release", "sdk"]
+tags: ["release", "python", "prompts"]
 draft: false
 ---
 
-# Python SDK for Minions Prompts
+# Bringing Prompt Version Control to Python
 
-We're thrilled to announce the release of the **Minions Prompts Python SDK** — bringing version-controlled prompt engineering to the Python ecosystem, where most AI/ML development happens.
+The Python ecosystem dominates AI and ML development. If you're building prompt-powered applications with LangChain, LlamaIndex, or direct API calls, you need proper prompt management — and now you can do it in Python.
+
+Today we're releasing the **Minions Prompts Python SDK**.
 
 <Callout type="info">
-The Python SDK provides full feature parity with the TypeScript SDK, including template management, version chains, variable interpolation, and test-driven prompt development.
+The Python SDK mirrors the TypeScript SDK's design while staying idiomatic — using Pydantic for validation, dataclasses for configuration, and async/await for I/O operations.
 </Callout>
 
 ## Installation
@@ -21,93 +23,121 @@ The Python SDK provides full feature parity with the TypeScript SDK, including t
 pip install minions-prompts
 ```
 
-## Quick Start
+## Template Management
 
 ```python
-from minions_prompts import PromptTemplate
+from minions_prompts import PromptRenderer, PromptChain
+from minions_prompts.types import PromptTemplate
 
+# Define a prompt template
 template = PromptTemplate(
-    name="code-reviewer",
-    content="Review the following {{language}} code for {{focus}}:\n\n{{code}}",
-    variables={
-        "language": {"type": "string", "default": "Python"},
-        "focus": {"type": "string", "default": "bugs and performance"},
-        "code": {"type": "string", "required": True},
-    },
+    name="summarizer",
+    content="Summarize the following {{format}}: {{text}}",
+    variables=["format", "text"],
+    tags=["summarization"]
 )
 
-rendered = template.render(
-    language="Python",
-    focus="security vulnerabilities",
-    code="user_input = input(); exec(user_input)",
-)
+# Render with variables
+renderer = PromptRenderer()
+rendered = renderer.render(template, {
+    "format": "research paper",
+    "text": "Long paper content..."
+})
+
 print(rendered)
 ```
 
-## Jupyter Notebook Integration
+## Version Chains in Python
 
-The Python SDK is designed to work seamlessly in Jupyter notebooks, making it perfect for interactive prompt iteration:
+Track prompt evolution with structured version chains.
 
 ```python
-# In a notebook cell
-from minions_prompts import PromptTemplate
+from minions_prompts import PromptChain
 
-template = PromptTemplate.load("summarizer")
+chain = PromptChain()
 
-# Iterate on the prompt
-v2 = template.fork(
-    content="Provide a concise summary of {{content}} in {{style}} style."
+# Add the initial version
+chain.add_version(
+    template_id="summarizer",
+    content="Summarize the following {{format}}: {{text}}",
+    changelog="Initial version"
 )
 
-# Compare outputs side by side
-comparison = template.compare(v2, input={"content": "...", "style": "academic"})
-comparison.display()  # Rich output in Jupyter
+# Add an improved version
+chain.add_version(
+    template_id="summarizer",
+    content="You are a precise summarizer. Summarize the following {{format}} in {{maxWords}} words: {{text}}",
+    changelog="Added word limit and persona"
+)
+
+# Get version history
+for version in chain.get_history("summarizer"):
+    print(f"v{version.number}: {version.changelog}")
 ```
 
-## Test-Driven Prompt Development
+## Prompt Scoring
 
-Write tests for your prompts in familiar pytest style:
+Evaluate and compare prompt versions programmatically.
 
 ```python
-import pytest
-from minions_prompts import PromptTemplate
+from minions_prompts import PromptScorer
 
-template = PromptTemplate.load("customer-support")
+scorer = PromptScorer()
 
-def test_professional_tone():
-    result = template.render(issue="refund request", tone="professional")
-    assert "refund" in result.lower()
-    assert len(result.split()) < 200
+# Score a single prompt output
+score = scorer.score(
+    output="This is a concise summary of the key findings...",
+    criteria={
+        "max_length": 200,
+        "min_length": 50,
+        "required_keywords": ["key findings"]
+    }
+)
 
-def test_required_variables():
-    with pytest.raises(ValueError, match="required"):
-        template.render()  # missing 'issue'
+print(f"Score: {score.value:.2f} ({score.passed}/{score.total} criteria met)")
+```
+
+## Diffing Prompts
+
+Compare prompt versions to understand exactly what changed.
+
+```python
+from minions_prompts import PromptDiff
+
+diff = PromptDiff()
+
+result = diff.compare(
+    old_content="Summarize: {{text}}",
+    new_content="You are a summarizer. Summarize in {{maxWords}} words: {{text}}"
+)
+
+for change in result.changes:
+    print(f"  {change.type}: {change.description}")
 ```
 
 <Callout type="tip">
-Add prompt tests to your CI pipeline with `pytest tests/prompts/` — catch regressions every time a template is modified.
+The Python SDK is fully compatible with the TypeScript SDK's serialization format. Templates created in TypeScript can be loaded and used in Python, and vice versa.
 </Callout>
 
-## LangChain & LlamaIndex Integration
+## Exporting to LangChain
 
-The Python SDK exports prompts in formats compatible with popular frameworks:
+One of the most requested features — export your versioned prompts directly to LangChain prompt templates.
 
 ```python
-from minions_prompts import PromptTemplate
+from minions_prompts import PromptExporter
 
-template = PromptTemplate.load("qa-assistant")
+exporter = PromptExporter()
+langchain_template = exporter.to_langchain(template)
 
-# Export to LangChain format
-langchain_prompt = template.to_langchain()
-
-# Export to LlamaIndex format
-llama_prompt = template.to_llama_index()
+# Use directly with LangChain
+from langchain.chains import LLMChain
+chain = LLMChain(llm=my_llm, prompt=langchain_template)
 ```
 
-## Language Interoperability
+## Get Started
 
-Both the TypeScript and Python SDKs use the same storage format and version chain protocol. Create a template with the TypeScript CLI, iterate on it in a Jupyter notebook, and deploy it from your Node.js server — everything stays in sync.
+Check out the [full documentation](https://prompts.minions.help) and start building a rigorous prompt engineering practice today.
 
-## Get Involved
-
-The Python SDK is open source and available on [PyPI](https://pypi.org/project/minions-prompts/). We welcome contributions — check out the [GitHub repository](https://github.com/mxn2020/minions-prompts) to get started.
+```bash
+pip install minions-prompts
+```
