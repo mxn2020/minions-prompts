@@ -1,64 +1,78 @@
 ---
-title: "Introducing Minions: A Universal Structured Object System"
-description: "Why we built Minions, what the three core primitives are, and how they help you build better AI agents."
+title: "Introducing Minions Prompts: Version Control for Prompt Engineering"
+description: "Why we built Minions Prompts — bringing version control, testing, and A/B comparison to the world of prompt engineering."
 date: 2026-02-20
 author: "Mehdi Nabhani"
-tags: ["announcement", "architecture", "agents"]
+tags: ["announcement", "architecture", "prompts"]
 draft: false
 ---
 
-# A New Way to Build AI Agents
+# The Missing Tool for Prompt Engineering
 
-Building AI agents today feels like stitching together a patchwork quilt of prompt chains, messy JSON objects, and fragile state management. As applications scale in complexity, managing the lifecycle and relationships between different entities becomes a monumental task. 
+Prompt engineering has become one of the most critical skills in AI development, yet the tooling around it remains surprisingly primitive. Most teams manage prompts in spreadsheets, Notion docs, or scattered text files — with no version history, no testing framework, and no way to systematically compare prompt variations.
 
-Enter **Minions** — a universal structured object system designed specifically for AI agents and systems.
+**Minions Prompts** brings the discipline of software engineering to prompt management.
 
 <Callout type="info">
-Minions is an open-source project aimed at fundamentally changing how developers architect complex, multi-modal, and multi-agent AI applications.
+Think of Minions Prompts as "GitHub for prompts" — version control, branching, testing, and A/B comparison for your prompt engineering workflow.
 </Callout>
 
-## The Problem with Current Solutions
+## The Problem
 
-Most current agent frameworks try to solve the *execution* problem: how do we chain LLM calls together? But the real challenge in production is the *state* problem: how do we manage the persistent, structured representations of real-world or digital concepts that these agents interact with?
+When you're iterating on a prompt, you need to:
 
-When you have a user, an agent, a goal, and a workspace, representing these cleanly requires profound boilerplates. 
+- **Track changes** — What did the prompt look like last week? What did I change?
+- **Test systematically** — Does this prompt still handle edge cases after my edit?
+- **Compare versions** — Is version 3 actually better than version 2?
+- **Collaborate safely** — How do I let a teammate experiment without breaking production prompts?
 
-## The Three Primitives of Minions
+Most teams solve this with copy-paste and naming conventions like `prompt_v3_final_FINAL.txt`. We can do better.
 
-Minions abstracts away the complexity by introducing three fundamental primitives:
+## How Minions Prompts Works
 
-### 1. Records
-The atomic unit of data. A `Record` is a validated, typed object that represents anything from a user profile to a configuration block. In Minions, records are strongly typed and validated at runtime.
+### Templates & Variables
 
-### 2. Relations
-Data rarely exists in isolation. `Relations` define directed, typed edges between Records. This allows you to build complex graphs of dependencies, like a "User" node connected to multiple "Agent" nodes with a "owns" relationship.
-
-### 3. Agents
-The active entities that operate on Records and Relations. `Agents` (or "minions") observe the state of the graph, make decisions, and mutate the graph over time.
-
-<Callout type="tip">
-By separating the data graph (Records/Relations) from the execution logic (Agents), your application becomes much easier to test, trace, and debug.
-</Callout>
-
-## Why Build This?
-
-We built Minions because we were tired of rewriting the same orchestration and database integration layers for every new AI project. 
+Prompts are stored as templates with typed variables that are interpolated at runtime:
 
 ```typescript
-import { createMinion } from 'minions-sdk';
+import { PromptTemplate } from '@minions-prompts/sdk';
 
-// A simple example of creating a minion
-const helper = createMinion({
-  id: 'helper_1',
-  role: 'assistant',
-  state: { status: 'idle' }
+const template = new PromptTemplate({
+  name: 'customer-support',
+  content: 'You are a {{role}} helping a customer with {{issue}}. Respond in {{tone}} tone.',
+  variables: {
+    role: { type: 'string', default: 'support agent' },
+    issue: { type: 'string', required: true },
+    tone: { type: 'enum', values: ['professional', 'friendly', 'concise'] },
+  },
 });
-
-console.log(`Agent ${helper.id} is ready to work!`);
 ```
+
+### Version Chains
+
+Every edit creates a new version linked to the previous one. You can traverse the full history, diff any two versions, and roll back to any point.
+
+### Test-Driven Prompt Development
+
+Write test cases for your prompts, just like you'd write unit tests for code:
+
+```typescript
+const testCase = {
+  input: { issue: 'billing error', tone: 'professional' },
+  assertions: [
+    { type: 'contains', value: 'billing' },
+    { type: 'max_tokens', value: 200 },
+    { type: 'sentiment', value: 'positive' },
+  ],
+};
+```
+
+<Callout type="tip">
+Test-driven prompt development catches regressions early. When you change a template, re-run your test suite to make sure all edge cases still pass.
+</Callout>
 
 ## What's Next?
 
-This is just the beginning. The `minions-sdk` is available on NPM, and we are actively developing the Python SDK to enable seamless language interoperability. Over the coming weeks, we will be releasing extensive tutorials, API documentation, and sample applications.
+The `@minions-prompts/sdk` is available on NPM, along with a CLI tool and a web-based playground. We're actively developing the Python SDK and adding integrations with LangChain and LlamaIndex.
 
-We invite you to join us on GitHub, read the specifications, and start building!
+Start version-controlling your prompts today!

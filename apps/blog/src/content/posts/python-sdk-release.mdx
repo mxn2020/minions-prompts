@@ -1,93 +1,113 @@
 ---
-title: "Python SDK Release: Crossing the Language Barrier"
-description: "With the release of the Minions Python SDK, you can now seamlessly interoperate between TypeScript frontends and Python AI backends."
-date: 2026-02-22
+title: "Minions Prompts Python SDK: Prompt Engineering in Python"
+description: "Announcing the Python SDK for Minions Prompts — version-control, test, and A/B compare prompts directly from your Python scripts and notebooks."
+date: 2026-02-20
 author: "Mehdi Nabhani"
-tags: ["release", "python", "interop"]
+tags: ["python", "release", "sdk"]
 draft: false
 ---
 
-# Bringing Minions to Python
+# Python SDK for Minions Prompts
 
-For the past few months, the Minions ecosystem has been heavily centered around TypeScript. It makes sense—modern full-stack applications heavily leverage Node.js and edge runtimes. But when it comes to actual AI models, data science, and heavy compute, Python is the undisputed king.
-
-Today, we are thrilled to announce the official **Minions Python SDK** (`packages/python/`). 
+We're thrilled to announce the release of the **Minions Prompts Python SDK** — bringing version-controlled prompt engineering to the Python ecosystem, where most AI/ML development happens.
 
 <Callout type="info">
-The Python SDK is designed with parity in mind. It mirrors the core architecture of the TypeScript SDK while remaining idiomatic to Python developers.
+The Python SDK provides full feature parity with the TypeScript SDK, including template management, version chains, variable interpolation, and test-driven prompt development.
 </Callout>
 
-## Why Language Interop Matters
+## Installation
 
-In a distributed AI system, you might have a Next.js or Astro frontend handling the user experience, while a Python cluster is handling vector embeddings, fine-tuning, or executing slow predictive models. 
+```bash
+pip install minions-prompts
+```
 
-By using Minions across both ends, you share a unified mental model. A `Record` or `Relation` serialized from TypeScript is natively deserialized and validated by Pydantic in Python.
-
-## Quick Look at the Python SDK
-
-Let's see how similar the API logic feels. 
+## Quick Start
 
 ```python
-from minions import create_minion, Relation
-from pydantic import BaseModel
+from minions_prompts import PromptTemplate
 
-class ResearcherState(BaseModel):
-    current_topic: str
-    sources_analyzed: int = 0
-
-# Creating a minion in Python
-researcher = create_minion(
-    id="res_01",
-    role="researcher",
-    state_model=ResearcherState,
-    initial_state={
-        "current_topic": "Quantum Computing AI"
-    }
+template = PromptTemplate(
+    name="code-reviewer",
+    content="Review the following {{language}} code for {{focus}}:\n\n{{code}}",
+    variables={
+        "language": {"type": "string", "default": "Python"},
+        "focus": {"type": "string", "default": "bugs and performance"},
+        "code": {"type": "string", "required": True},
+    },
 )
 
-print(f"Researcher {researcher.id} assigned topic: {researcher.state.current_topic}")
+rendered = template.render(
+    language="Python",
+    focus="security vulnerabilities",
+    code="user_input = input(); exec(user_input)",
+)
+print(rendered)
 ```
 
-Notice the use of Pydantic for state validation. It provides the exact same robust guarantee as `zod` does in the TypeScript ecosystem.
+## Jupyter Notebook Integration
 
-## Cross-SDK Serialization
+The Python SDK is designed to work seamlessly in Jupyter notebooks, making it perfect for interactive prompt iteration:
 
-Transporting state between a Node.js worker and a FastAPI Python backend is completely seamless.
-
-**TypeScript Side (Sender):**
-```typescript
-const recordJson = JSON.stringify(myMinion.toJSON());
-await fetch('https://api.my-cluster.com/process', {
-  method: 'POST',
-  body: recordJson
-});
-```
-
-**Python Side (Receiver):**
 ```python
-from fastapi import FastAPI, Request
-from minions.serialization import MinionDeserializer
+# In a notebook cell
+from minions_prompts import PromptTemplate
 
-app = FastAPI()
+template = PromptTemplate.load("summarizer")
 
-@app.post("/process")
-async def process_minion(request: Request):
-    payload = await request.json()
-    
-    # Safely reconstruct the Minion object graph
-    minion = MinionDeserializer.parse(payload)
-    
-    # Work on the strictly typed minion object
-    result = execute_heavy_model(minion.state)
-    return {"status": "success"}
+# Iterate on the prompt
+v2 = template.fork(
+    content="Provide a concise summary of {{content}} in {{style}} style."
+)
+
+# Compare outputs side by side
+comparison = template.compare(v2, input={"content": "...", "style": "academic"})
+comparison.display()  # Rich output in Jupyter
 ```
 
-<Callout type="warning">
-When passing structured objects across network boundaries, ensure that both your TypeScript `zod` schemas and Python `Pydantic` models remain synchronized. We recommend generating them from a single source of truth using tools like TypeSpec or OpenAPI.
+## Test-Driven Prompt Development
+
+Write tests for your prompts in familiar pytest style:
+
+```python
+import pytest
+from minions_prompts import PromptTemplate
+
+template = PromptTemplate.load("customer-support")
+
+def test_professional_tone():
+    result = template.render(issue="refund request", tone="professional")
+    assert "refund" in result.lower()
+    assert len(result.split()) < 200
+
+def test_required_variables():
+    with pytest.raises(ValueError, match="required"):
+        template.render()  # missing 'issue'
+```
+
+<Callout type="tip">
+Add prompt tests to your CI pipeline with `pytest tests/prompts/` — catch regressions every time a template is modified.
 </Callout>
 
-## Get It Now
+## LangChain & LlamaIndex Integration
 
-The Python SDK is available starting today in the main Minions monorepo under `packages/python/`. You can install it directly or pull the package into your own poetry environments.
+The Python SDK exports prompts in formats compatible with popular frameworks:
 
-We can't wait to see the multi-language, multi-agent systems you build.
+```python
+from minions_prompts import PromptTemplate
+
+template = PromptTemplate.load("qa-assistant")
+
+# Export to LangChain format
+langchain_prompt = template.to_langchain()
+
+# Export to LlamaIndex format
+llama_prompt = template.to_llama_index()
+```
+
+## Language Interoperability
+
+Both the TypeScript and Python SDKs use the same storage format and version chain protocol. Create a template with the TypeScript CLI, iterate on it in a Jupyter notebook, and deploy it from your Node.js server — everything stays in sync.
+
+## Get Involved
+
+The Python SDK is open source and available on [PyPI](https://pypi.org/project/minions-prompts/). We welcome contributions — check out the [GitHub repository](https://github.com/mxn2020/minions-prompts) to get started.

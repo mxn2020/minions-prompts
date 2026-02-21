@@ -1,111 +1,118 @@
 ---
-title: "Building with the Minions SDK: A Technical Tutorial"
-description: "Learn how to create agents, link them with relations, and validate fields using the new minors-sdk in TypeScript."
-date: 2026-02-21
+title: "Building a Prompt Playground with the Minions Prompts SDK"
+description: "A hands-on guide to building an interactive prompt playground using the @minions-prompts/sdk — render, test, and diff prompt versions in real time."
+date: 2026-02-20
 author: "Mehdi Nabhani"
-tags: ["tutorial", "typescript", "sdk"]
+tags: ["tutorial", "sdk", "playground"]
 draft: false
 ---
 
-# Getting Started with the Minions SDK
+# Building a Prompt Playground
 
-In our previous post, we introduced the theoretical concepts behind Minions. Today, we're diving into the code. The `minions-sdk` is a robust, type-safe library for Node.js and the browser that brings the Minions specification to life.
+One of the best ways to iterate on prompts is to see them render in real time as you edit. In this tutorial, we'll walk through building an interactive prompt playground using the Minions Prompts SDK.
 
-## Installation
+## Prerequisites
 
-First, install the SDK using your preferred package manager.
+- Node.js 20+
+- The `@minions-prompts/sdk` package
 
 ```bash
-pnpm add minions-sdk
+npm install @minions-prompts/sdk
 ```
 
-<Callout type="warning">
-Make sure you are using TypeScript >= 5.0 and `strict: true` in your `tsconfig.json` to get the most out of the SDK's type inference.
+## Creating a Template
+
+Start by defining a prompt template with variables:
+
+```typescript
+import { PromptTemplate } from '@minions-prompts/sdk';
+
+const template = new PromptTemplate({
+  name: 'summarizer',
+  content: `Summarize the following {{content_type}} in {{word_count}} words or fewer.
+Focus on: {{focus_areas}}.
+Audience: {{audience}}.
+
+Content:
+{{content}}`,
+  variables: {
+    content_type: { type: 'string', default: 'article' },
+    word_count: { type: 'number', default: 100 },
+    focus_areas: { type: 'string', default: 'key takeaways' },
+    audience: { type: 'string', default: 'general' },
+    content: { type: 'string', required: true },
+  },
+});
+```
+
+## Rendering with Variables
+
+The SDK handles variable interpolation and validation:
+
+```typescript
+const rendered = template.render({
+  content_type: 'research paper',
+  word_count: 150,
+  focus_areas: 'methodology and findings',
+  audience: 'PhD researchers',
+  content: '...',
+});
+
+console.log(rendered);
+// "Summarize the following research paper in 150 words or fewer..."
+```
+
+<Callout type="info">
+The SDK validates all variables at render time. Missing required variables throw descriptive errors, and type mismatches are caught before the prompt reaches your LLM.
 </Callout>
 
-## Creating Your First Minion
+## Version History
 
-A minion in our system isn't just a wrapper around an LLM—it's a structured entity with validated state. Let's define one.
+Every time you save a template, a new version is created. You can traverse the history and diff any two versions:
 
 ```typescript
-import { createMinion, z } from 'minions-sdk';
+// Create a new version
+const v2 = template.fork({
+  content: `Summarize the following {{content_type}} in exactly {{word_count}} words.
+Be precise and factual. Audience: {{audience}}.
 
-// 1. Define the custom state schema
-const DeveloperState = z.object({
-  currentTask: z.string(),
-  linesOfCodeWritten: z.number().default(0)
+Content:
+{{content}}`,
 });
 
-// 2. Create the minion instance
-const devMinion = createMinion({
-  id: 'dev_01',
-  role: 'developer',
-  stateSchema: DeveloperState,
-  initialState: {
-    currentTask: 'Setup project repository',
-  }
-});
-
-console.log(devMinion.state.currentTask);
+// Diff the two versions
+const diff = template.diff(v2);
+console.log(`${diff.additions} lines added, ${diff.deletions} lines removed`);
 ```
 
-Notice how `createMinion` enforces the types of your `initialState` based on the `zod` schema you provide. If you pass an invalid state, you'll get a runtime error immediately, not deep within your application logic later on.
+## Running Tests
 
-## Linking Agents with Relations
-
-The real power of Minions comes from linking entities together. Let's create a "Manager" minion and link it to our "Developer".
+Write test cases to validate that your prompt produces the expected results:
 
 ```typescript
-import { createMinion, createRelation } from 'minions-sdk';
+const results = await template.runTests([
+  {
+    variables: { content: 'Sample text...', word_count: 50 },
+    assertions: [
+      { type: 'max_tokens', value: 75 },
+      { type: 'no_hallucination', reference: 'Sample text...' },
+    ],
+  },
+]);
 
-const managerMinion = createMinion({
-  id: 'mgr_01',
-  role: 'manager'
-});
-
-// Create a relation directed from manager to developer
-const managesRelation = createRelation({
-  source: managerMinion.id,
-  target: devMinion.id,
-  type: 'MANAGES',
-  metadata: {
-    assignedAt: new Date().toISOString()
-  }
-});
-```
-
-### Querying the Graph
-
-Once you have established relationships, you can query your object graph to understand the current state of your system. 
-
-```typescript
-// Example conceptual query
-const team = getOutboundRelations(managerMinion.id, 'MANAGES');
-console.log(`Manager oversees ${team.length} minions.`);
+console.log(`${results.passed}/${results.total} tests passed`);
 ```
 
 <Callout type="tip">
-When designing your system graph, it is a best practice to keep relations unidirectional. If you need bidirectional flow, create two separate relations.
+Integrate `template.runTests()` into your CI pipeline to catch prompt regressions before they reach production.
 </Callout>
 
-## Field Validation and Updates
+## What You Can Build From Here
 
-When mutating the state of a minion, the SDK automatically re-validates the fields to ensure integrity.
+This basic playground can be extended with:
 
-```typescript
-// Valid update
-devMinion.updateState({ linesOfCodeWritten: 120 });
+- **Side-by-side diff viewer** — Compare two prompt versions visually
+- **A/B test launcher** — Run the same input through two template versions and compare outputs
+- **Scoring dashboard** — Track prompt quality scores over time
 
-// Invalid update - will throw an SDK ValidationError
-try {
-  devMinion.updateState({ linesOfCodeWritten: -10 }); 
-} catch (e) {
-  console.error("Caught invalid state transition!");
-}
-```
-
-## Conclusion
-
-We've only scratched the surface of what you can build with the Minions SDK. The structured nature of Records, combined with strictly typed Relations, creates a bullet-proof foundation for the most complex AI applications. 
-
-Check out the [Docs](https://minions.help) for deeper dives into workspace management and distributed tracing!
+Check out the full playground implementation in the [web app source code](https://github.com/mxn2020/minions-prompts) and the [SDK documentation](https://prompts.minions.help).

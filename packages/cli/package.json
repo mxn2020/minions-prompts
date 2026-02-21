@@ -2,11 +2,29 @@
   "name": "@minions-prompts/cli",
   "version": "0.1.3",
   "description": "CLI for minions-prompts — version-controlled prompt engineering",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mxn2020/minions-prompts"
+  },
+  "homepage": "https://minions-prompts.help",
+  "keywords": [
+    "prompts",
+    "ai",
+    "cli",
+    "minions",
+    "versioning"
+  ],
+  "author": "Mehdi Nabhani <mehdi@the-mehdi.com> (https://the-mehdi.com)",
   "type": "module",
   "bin": {
     "prompts": "./dist/index.js"
   },
   "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
     "lint": "tsc --noEmit",
@@ -22,6 +40,5 @@
   "devDependencies": {
     "@types/node": "^25.3.0",
     "typescript": "^5.9.3"
-  },
-  "license": "MIT"
+  }
 }

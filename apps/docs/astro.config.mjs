@@ -28,7 +28,7 @@ export default defineConfig({
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/mxn2020/minions-prompts' },
         { icon: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/in/mnx/' },
-        { icon: 'external', label: 'App', href: 'https://www.minions.wtf' },
+        { icon: 'external', label: 'App', href: 'https://prompts.minions.wtf' },
       ],
       sidebar: [
         {
