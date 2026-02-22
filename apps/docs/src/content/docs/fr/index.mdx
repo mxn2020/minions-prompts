@@ -1,0 +1,45 @@
+---
+title: minions-prompts
+description: GitHub pour les prompts — contrôle de version, tests et comparaison A/B pour le prompt engineering.
+template: splash
+hero:
+  tagline: Prompt engineering versionné. Traitez les prompts comme du code.
+  actions:
+    - text: Commencer
+      link: /fr/getting-started/installation/
+      icon: right-arrow
+      variant: primary
+    - text: Voir sur GitHub
+      link: https://github.com/mxn2020/minions-prompts
+      icon: external
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+## Commencez ici
+
+<CardGrid>
+  <LinkCard title="Introduction" description="Qu'est-ce que minions-prompts et à qui s'adresse-t-il ?" href="/fr/getting-started/introduction/" />
+  <LinkCard title="Démarrage rapide" description="Créez votre premier prompt versionné en 5 minutes." href="/fr/getting-started/quick-start/" />
+  <LinkCard title="Tests A/B" description="Comparez les variations de prompts de manière systématique." href="/fr/guides/ab-testing/" />
+  <LinkCard title="Référence API" description="Référence complète des SDK TypeScript et Python." href="/fr/api/typescript/" />
+</CardGrid>
+
+---
+
+## Pourquoi versionner les prompts ?
+
+<CardGrid stagger>
+  <Card title="Historique complet des versions" icon="pencil">
+    Chaque modification est suivie via des relations `follows` — ne perdez plus jamais un changement.
+  </Card>
+  <Card title="Interpolation de variables" icon="add-document">
+    `{{variable}}`, `{{#if condition}}`, `{{#each items}}` — des templates puissants.
+  </Card>
+  <Card title="Développement piloté par les tests" icon="approve-check">
+    Créez des cas de test avant de modifier les prompts — détectez les régressions.
+  </Card>
+  <Card title="Comparaison A/B" icon="setting">
+    Exécutez deux versions contre les mêmes tests et comparez les résultats.
+  </Card>
+</CardGrid>

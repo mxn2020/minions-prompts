@@ -1,9 +1,9 @@
 ---
 const navLinks = [
   { text: 'Blog', href: '/' },
-  { text: 'Docs', href: 'https://minions.help' },
-  { text: 'Playground', href: 'https://app.minions.wtf' },
-  { text: 'GitHub', href: 'https://github.com/mxn2020/minions' }
+  { text: 'Docs', href: 'https://prompts.minions.help', external: true },
+  { text: 'App', href: 'https://prompts.minions.wtf', external: true },
+  { text: 'GitHub', href: 'https://github.com/mxn2020/minions-prompts', external: true }
 ];
 ---
 
@@ -16,7 +16,9 @@ const navLinks = [
     <nav class="hidden md:flex items-center space-x-6">
       {navLinks.map(link => (
         <a 
-          href={link.href} 
+          href={link.href}
+          target={link.external ? '_blank' : undefined}
+          rel={link.external ? 'noopener noreferrer' : undefined}
           class="text-sm font-medium text-muted hover:text-primary transition-colors"
         >
           {link.text}
@@ -25,8 +27,7 @@ const navLinks = [
     </nav>
     
     <div class="flex items-center md:hidden">
-      <!-- Mobile menu button can be here, keeping simple for now -->
-      <a href="https://github.com/mxn2020/minions" class="text-sm font-medium text-muted hover:text-primary transition-colors">
+      <a href="https://github.com/mxn2020/minions-prompts" target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-muted hover:text-primary transition-colors">
         GitHub
       </a>
     </div>
