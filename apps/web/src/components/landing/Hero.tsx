@@ -75,33 +75,30 @@ export default function Hero() {
                                 <span className="text-xs text-muted ml-2 font-mono">terminal</span>
                             </div>
                             {/* Terminal Content */}
-                            <div className="p-6 font-mono text-sm space-y-4">
+                            <div className="p-6 font-mono text-sm space-y-4 overflow-x-auto whitespace-nowrap">
                                 <div className="flex items-start gap-2">
                                     <Terminal className="w-4 h-4 text-accent mt-0.5 shrink-0" />
                                     <div>
                                         <span className="text-muted">$ </span>
                                         <span className="text-accent">npm</span>
-                                        <span className="text-primary"> install minions-prompts</span>
+                                        <span className="text-primary"> install -g @minions-prompts/cli</span>
                                     </div>
-                                </div>
-                                <div className="text-muted text-xs pl-6 space-y-1">
-                                    <p>added 8 packages in 1.4s</p>
-                                    <p className="text-success">✓ minions-prompts installed</p>
                                 </div>
                                 <div className="border-t border-border pt-4 flex items-start gap-2">
                                     <Terminal className="w-4 h-4 text-accent mt-0.5 shrink-0" />
                                     <div>
                                         <span className="text-muted">$ </span>
                                         <span className="text-accent">prompts</span>
-                                        <span className="text-primary"> diff v1.0 v1.1 --template chat-agent</span>
+                                        <span className="text-primary"> diff v1.2.0 v1.3.0</span>
                                     </div>
                                 </div>
-                                <div className="text-muted text-xs pl-6 space-y-1">
-                                    <p className="text-error">- temperature: 0.7</p>
-                                    <p className="text-success">+ temperature: 0.3</p>
-                                    <p className="text-error">- max_tokens: 2048</p>
-                                    <p className="text-success">+ max_tokens: 4096</p>
-                                    <p className="mt-2">2 fields changed, 0 added, 0 removed</p>
+                                <div className="text-xs space-y-1 bg-background inset-0 p-3 rounded border border-border">
+                                    <div className="text-muted">--- a/prompts/customer_support.json</div>
+                                    <div className="text-muted">+++ b/prompts/customer_support.json</div>
+                                    <div className="text-slate-400">  "system": "You are a helpful assistant.",</div>
+                                    <div className="text-error bg-error/10 px-1">- "tone": "formal"</div>
+                                    <div className="text-success bg-success/10 px-1">+ "tone": "friendly and concise",</div>
+                                    <div className="text-success bg-success/10 px-1">+ "max_tokens": 150</div>
                                 </div>
                             </div>
                         </div>
