@@ -7,6 +7,7 @@ import { DiffViewer } from './DiffViewer';
 import { TabGroup } from '../shared/TabGroup';
 import { Button } from '../shared/Button';
 import { Link } from 'react-router-dom';
+import { ArrowLeft, Circle, Save } from 'lucide-react';
 
 interface Variable {
     name: string;
@@ -74,14 +75,27 @@ export function PlaygroundLayout() {
 
     return (
         <div className="flex flex-col h-screen bg-background text-primary overflow-hidden">
-            <header className="h-14 border-b border-border flex items-center justify-between px-4 bg-surface/50">
-                <div className="flex items-center space-x-4">
-                    <Link to="/" className="text-muted hover:text-primary transition-colors text-sm">
-                        ← Back
+            <header className="h-14 border-b border-border flex items-center justify-between px-4 bg-surface/80 backdrop-blur-md">
+                <div className="flex items-center gap-4">
+                    <Link to="/" className="inline-flex items-center gap-1.5 text-muted hover:text-primary transition-colors text-sm group">
+                        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                        Home
                     </Link>
-                    <span className="font-mono font-bold">Prompt Playground</span>
+                    <div className="w-px h-5 bg-border" />
+                    <div className="flex items-center gap-2">
+                        <span className="font-mono font-bold text-primary">Prompt Playground</span>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs">
+                            <Circle className="w-1.5 h-1.5 fill-current" />
+                            Live
+                        </span>
+                    </div>
                 </div>
-                <Button onClick={saveVersion} size="sm">Save Version</Button>
+                <Button onClick={saveVersion} size="sm">
+                    <span className="inline-flex items-center gap-1.5">
+                        <Save className="w-3.5 h-3.5" />
+                        Save Version
+                    </span>
+                </Button>
             </header>
 
             <div className="flex-1 overflow-y-auto p-6">
