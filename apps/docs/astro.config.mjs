@@ -9,6 +9,7 @@ export default defineConfig({
   site: siteUrl,
   integrations: [
     starlight({
+      customCss: ['./src/styles/custom.css'],
       title: 'Minions Prompts',
       description: 'GitHub for prompts — version control, testing, and A/B comparison for prompt engineering.',
       defaultLocale: 'root',
