@@ -12,7 +12,6 @@ function makeMinion(fields: Record<string, unknown>, overrides?: Partial<Minion>
         tags: [],
         createdAt: now(),
         updatedAt: now(),
-        version: 1,
         ...overrides,
     };
 }
