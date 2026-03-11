@@ -1,0 +1,9 @@
+.vercel
+
+# Added by AI Agent
+node_modules
+dist
+.env
+.env.*
+!.env.example
+.DS_Store

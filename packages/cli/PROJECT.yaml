@@ -1,0 +1,8 @@
+name: "@minions-prompts/cli"
+project_scope: child
+child_type: cli
+parent_project: minions-prompts-workspace
+description: CLI for minions-prompts — version-controlled prompt engineering
+priority: high
+deploy_url: null
+tags: null

@@ -17,12 +17,24 @@
     "deploy:web": "pnpm --filter minions-prompts-web run build && netlify deploy --dir apps/web/dist --prod",
     "test": "pnpm --filter @minions-prompts/sdk run test",
     "lint": "pnpm --filter @minions-prompts/sdk run build && pnpm --filter @minions-prompts/sdk run lint && pnpm --filter @minions-prompts/cli run lint",
-    "deploy": "pnpm run deploy:blog"
+    "deploy": "pnpm run deploy:blog",
+    "dev": "echo 'no dev'",
+    "stop": "pkill -f 'node.*minions-prompts' || true"
   },
   "engines": {
     "node": ">=20"
   },
   "devDependencies": {
-    "typescript": "^5.9.3"
-  }
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mxn2020/minions"
+  },
+  "keywords": [
+    "minions",
+    "ecosystem",
+    "compliance"
+  ]
 }

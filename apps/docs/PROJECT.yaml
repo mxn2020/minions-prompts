@@ -1,0 +1,8 @@
+name: minions-prompts-docs
+project_scope: child
+child_type: docs
+parent_project: minions-prompts-workspace
+description: Standard compliance definition for minions-prompts-docs
+priority: high
+deploy_url: null
+tags: null

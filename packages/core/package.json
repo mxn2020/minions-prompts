@@ -21,7 +21,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "tsc --noEmit",
-    "docs": "typedoc"
+    "docs": "typedoc",
+    "dev": "echo 'no dev'"
   },
   "dependencies": {
     "minions-sdk": "^0.2.3"

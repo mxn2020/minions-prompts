@@ -1,3 +1,5 @@
+![CI](https://github.com/mxn2020/minions-prompts-workspace/actions/workflows/ci.yml/badge.svg) ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+
 # minions-prompts
 
 **Version-controlled prompt engineering.** Track every prompt change, test variations systematically, and compare versions with measurable scores.

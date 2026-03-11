@@ -1,0 +1,15 @@
+name: minions-prompts-workspace
+project_scope: main
+project_type: monorepo
+description: "Version control, testing, and A/B comparison for prompt engineering"
+tier: idea
+lane: minions
+priority: medium
+oss: true
+stack: [typescript]
+repo: "https://github.com/mxn2020/minions-prompts"
+deploy_url: null
+last_active: 2026-02-23
+tags: [minion, toolbox, ai-agent, automation, minions, prompts]
+notes: null
+id: 4d8b4144-f3d5-4ac8-a34b-19ee04a2d4cc

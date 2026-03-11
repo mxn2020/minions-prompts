@@ -1,0 +1,8 @@
+name: "@minions-prompts/sdk"
+project_scope: child
+child_type: sdk
+parent_project: minions-prompts-workspace
+description: Version-controlled prompt engineering system built on the Minions SDK
+priority: high
+deploy_url: null
+tags: null
