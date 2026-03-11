@@ -6,3 +6,4 @@ description: CLI for minions-prompts — version-controlled prompt engineering
 priority: high
 deploy_url: null
 tags: null
+category: minion-toolbox
